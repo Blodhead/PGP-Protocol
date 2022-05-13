@@ -16,7 +16,7 @@
 *Encryption
 -> IDEA algorithm: 
 
-#Options
+#Options ------------------------------------------------------------------------------------------
 
 -> Zip compression in java: https://www.codejava.net/java-se/file-io/how-to-compress-files-in-zip-format-in-java
 
