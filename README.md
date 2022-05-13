@@ -14,7 +14,7 @@
 -> 3DES algorithm:
 
 *Encryption
--> IDEA algorithm: 
+-> IDEA algorithm: https://www.geeksforgeeks.org/simplified-international-data-encryption-algorithm-idea/
 
 #Options ------------------------------------------------------------------------------------------
 
