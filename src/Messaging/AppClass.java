@@ -1,12 +1,11 @@
 package Messaging;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import static Messaging.Provider.*;
+import static Messaging.Admin.*;
 
 public class AppClass {
 
-    BouncyCastleProvider provider = getProvider();
-
+    Admin admin = Admin.getAdmin();
     public static void main(String[] args) {
         String msg = "";
         System.out.println("Hello world");

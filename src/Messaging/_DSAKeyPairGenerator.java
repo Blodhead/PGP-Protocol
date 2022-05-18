@@ -2,7 +2,7 @@ package Messaging;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
-import org.bouncycastle.bcpg.RSASecretBCPGKey;
+import org.bouncycastle.bcpg.DSASecretBCPGKey;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
@@ -31,18 +31,27 @@ public class _DSAKeyPairGenerator { //Napraviti za DSA
         {
             secretOut = new ArmoredOutputStream(secretOut);
         }
+///////////////////////
 
+        try {
+            Admin.keyPairGen = KeyPairGenerator.getInstance("DSA");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        Admin.keyPairGen.initialize(1024, new SecureRandom()); //za 1024
+        KeyPair dsaKeyPair = Admin.keyPairGen.generateKeyPair();
+/////////////////////////////
 
-        PGPPublicKey a = (new JcaPGPKeyConverter().getPGPPublicKey(PGPPublicKey.RSA_GENERAL, publicKey, new Date()));
-        RSAPrivateCrtKey rsK = (RSAPrivateCrtKey)privateKey;
-        RSASecretBCPGKey privPk = new RSASecretBCPGKey(rsK.getPrivateExponent(), rsK.getPrimeP(), rsK.getPrimeQ());
+        /*PGPPublicKey a = (new JcaPGPKeyConverter().getPGPPublicKey(PGPPublicKey.RSA_GENERAL, publicKey, new Date()));
+        DSAPrivateCrtKey rsK = (DSAPrivateCrtKey)privateKey;
+        DSASecretBCPGKey privPk = new DSASecretBCPGKey(rsK.getPrivateExponent(), rsK.getPrimeP(), rsK.getPrimeQ());
         PGPPrivateKey b = new PGPPrivateKey(a.getKeyID(), a.getPublicKeyPacket(), privPk);
-
+*/
         PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
-        PGPKeyPair          keyPair = new PGPKeyPair(a,b);
-        PGPSecretKey        secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, keyPair, identity, sha1Calc, null, null, new JcaPGPContentSignerBuilder(keyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA1), new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).setProvider("BC").build(passPhrase));
+        ///PGPKeyPair          keyPair = new PGPKeyPair(a,b);
+        //PGPSecretKey        secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, keyPair, identity, sha1Calc, null, null, new JcaPGPContentSignerBuilder(keyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA1), new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).setProvider("BC").build(passPhrase));
 
-        secretKey.encode(secretOut);
+        //secretKey.encode(secretOut);
 
         secretOut.close();
 
@@ -51,9 +60,9 @@ public class _DSAKeyPairGenerator { //Napraviti za DSA
             publicOut = new ArmoredOutputStream(publicOut);
         }
 
-        PGPPublicKey    key = secretKey.getPublicKey();
+        //PGPPublicKey    key = secretKey.getPublicKey();
 
-        key.encode(publicOut);
+        //key.encode(publicOut);
 
         publicOut.close();
     }

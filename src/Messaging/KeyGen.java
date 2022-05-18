@@ -29,7 +29,7 @@ public class KeyGen {
 
     public void genKeyPair() throws InvalidKeyException, NoSuchProviderException, SignatureException, IOException, PGPException, NoSuchAlgorithmException {
 
-        Security.addProvider(new BouncyCastleProvider());// poziv ce glasiti nesto.getProvider();
+        Security.addProvider(new BouncyCastleProvider());// poziv ce glasiti app.getProvider();
 
         KeyPairGenerator    kpg = KeyPairGenerator.getInstance("DSA", "BC");
 
@@ -40,7 +40,7 @@ public class KeyGen {
         FileOutputStream    out1 = new FileOutputStream(privKeyFile);
         FileOutputStream    out2 = new FileOutputStream(pubKeyFile);
 
-        //randomKeyGen.exportKeyPair(out1, out2, kp.getPublic(), kp.getPrivate(), id, passwd.toCharArray());//poziv glasi nesto.getProvider().getRandomKeyGen();
+        //randomKeyGen.exportKeyPair(out1, out2, kp.getPublic(), kp.getPrivate(), id, passwd.toCharArray());//poziv glasi app.getProvider().getRandomKeyGen();
 
 
     }
