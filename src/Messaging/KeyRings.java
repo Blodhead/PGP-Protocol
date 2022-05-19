@@ -1,16 +1,22 @@
 package Messaging;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
+import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
 
-<<<<<<< Updated upstream
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.interfaces.DSAKeyPairGenerator;
+import java.security.interfaces.DSAParams;
 import java.util.Collections;
 import java.util.List;
 
-=======
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -19,7 +25,7 @@ import java.security.*;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
->>>>>>> Stashed changes
+
 
 public class KeyRings {
 
@@ -37,52 +43,35 @@ public class KeyRings {
         }
     }
 
-    public static void generateNewKeyPair(int _userId, long _keyId, String _password){
+    private static void generateNewKeyPair(int size){
 
-        KeyPairGenerator kpg = null;
         try {
-            kpg = KeyPairGenerator.getInstance("DSA", "BC");
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", "BC");
 
-            kpg.initialize(1024);
+            kpg.initialize(size);
             KeyPair kp = kpg.generateKeyPair();
 
             SecureRandom secureRandom = new SecureRandom();
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("DSA");
 
-            keyPairGenerator.initialize(1024, secureRandom);
+            keyPairGenerator.initialize(size, secureRandom);
 
             KeyPair keyPair =  keyPairGenerator.generateKeyPair();
             PublicKey publicKey = keyPair.getPublic();
             PrivateKey privateKey = keyPair.getPrivate();
 
-            PGPKeyPair pair2 = new PGPKeyPair(new PGPKeyPair())
+            PGPPublicKey bPublicKey = new JcaPGPKeyConverter().getPGPPublicKey(PGPPublicKey.ELGAMAL_ENCRYPT, publicKey, new Date());
+            PGPPrivateKey bPprivateKey = new JcaPGPKeyConverter().getPGPPrivateKey(bPublicKey, privateKey);
 
-            PGPKeyPair pair = new PGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, kp, new Date(), "BC");
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
+        } catch (PGPException e) {
+            e.printStackTrace();
         }
 
-//        try {
-//        // byte sessionKey[], byte publicKey[]
-//
-//            SecureRandom secureRandom = new SecureRandom();
-//            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("DSA");
-//
-//            keyPairGenerator.initialize(1024, secureRandom);
-//
-//            KeyPair keyPair =  keyPairGenerator.generateKeyPair();
-//
-//            System.out.println("Public Key is: " + keyPair.getPublic().toString());
-//            System.out.println("Privte Key is: " + keyPair.getPrivate().toString());
-//
-//            PrivateKey privateKey = keyPair.getPrivate();
-//            PublicKey myPublicKey = keyPair.getPublic();
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
 
         //private LocalDate date = LocalDate.now();   //yyyy-mm-dd date of generated keys
         //private KeyStore.PrivateKeyEntry privateKey;         //encrypted private key by IDEA and hashed password
@@ -91,6 +80,12 @@ public class KeyRings {
         //private KeyStore.ProtectionParameter password;
         //ovde ubaciti kod za generisanje kljuceva
     }
+
+
+    public static void generateNewUserKeyPair(String userId, int size) {
+
+    }
+
 
     public void storeToPrivateKeyRing(InputStream _stream){
         PGPSecretKeyRing newKey;
