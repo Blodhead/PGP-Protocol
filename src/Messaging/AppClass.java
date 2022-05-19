@@ -1,7 +1,7 @@
 package Messaging;
 
 import java.io.IOException;
-
+import App.*;
 //import Zipping.*;
 public class AppClass {
 
@@ -19,6 +19,8 @@ public class AppClass {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        View_User.getUser_view();
 
     }
 
