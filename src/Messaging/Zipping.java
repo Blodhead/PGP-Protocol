@@ -24,4 +24,17 @@ public static void zip(String file_name) throws IOException {
     fos.close();
     }
 
+public static void unzip(String file_name) throws IOException {
+    String fileZip = "compressed.zip";
+    File destDir = new File("unzipTest");
+    byte[] buffer = new byte[1024];
+    ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
+    ZipEntry zipEntry = zis.getNextEntry();
+    while (zipEntry != null) {
+        // ...
+    }
+    zis.closeEntry();
+    zis.close();
+}
+
 }
