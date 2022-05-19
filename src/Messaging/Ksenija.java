@@ -5,7 +5,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.math.BigInteger;
 import java.security.*;
-
+import org.bouncycastle.crypto.engines.ElGamalEngine;
+import org.bouncycastle.crypto.params.ElGamalParameters;
 
 public class Ksenija {
 
@@ -52,6 +53,28 @@ public class Ksenija {
             System.out.println("Privte Key is: " + keyPair.getPrivate().toString());
 
             PrivateKey privateKey = keyPair.getPrivate();
+            PublicKey myPublicKey = keyPair.getPublic();
+
+
+            ElGamalParameters elParams = new ElGamalParameters(myPublicKey);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            ElGamalEngine ege = new ElGamalEngine();
+
+            ege.init(true, );
 
             Cipher cipher = Cipher.getInstance(DSA);
 

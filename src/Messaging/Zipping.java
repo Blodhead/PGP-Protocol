@@ -6,35 +6,35 @@ import java.io.IOException;
 import java.util.zip.*;
 public class Zipping {
 
-public static void zip(String file_name) throws IOException {
-    String sourceFile = file_name;
-    FileOutputStream fos = new FileOutputStream("compressed.zip");
-    ZipOutputStream zipOut = new ZipOutputStream(fos);
-    File fileToZip = new File(sourceFile);
-    FileInputStream fis = new FileInputStream(fileToZip);
-    ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
-    zipOut.putNextEntry(zipEntry);
-    byte[] bytes = new byte[1024];
-    int length;
-    while((length = fis.read(bytes)) >= 0) {
-        zipOut.write(bytes, 0, length);
-    }
-    zipOut.close();
-    fis.close();
-    fos.close();
-    }
+    public static void zip(String file_name) throws IOException {
+        String sourceFile = file_name;
+        FileOutputStream fos = new FileOutputStream("compressed.zip");
+        ZipOutputStream zipOut = new ZipOutputStream(fos);
+        File fileToZip = new File(sourceFile);
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[1024];
+        int length;
+        while((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        zipOut.close();
+        fis.close();
+        fos.close();
+        }
 
-public static void unzip(String file_name) throws IOException {
-    String fileZip = "compressed.zip";
-    File destDir = new File("unzipTest");
-    byte[] buffer = new byte[1024];
-    ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
-    ZipEntry zipEntry = zis.getNextEntry();
-    while (zipEntry != null) {
-        // ...
-    }
-    zis.closeEntry();
-    zis.close();
+    public static void unzip(String file_name) throws IOException {
+        String fileZip = "compressed.zip";
+        File destDir = new File("unzipTest");
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
+        ZipEntry zipEntry = zis.getNextEntry();
+        while (zipEntry != null) {
+            // ...
+        }
+        zis.closeEntry();
+        zis.close();
 }
 
 }
