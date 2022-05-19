@@ -11,7 +11,8 @@ public class AppClass {
         System.out.println("Hello world");
 
         try {
-            Zipping.zip("test.txt");
+            Zipping.zip("test.txt", "compressed.zip");
+            Zipping.unzip("compressed.zip", "unziped.txt");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

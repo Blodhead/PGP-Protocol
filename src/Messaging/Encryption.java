@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class Encryption {
 
-
+/*
     public static void encrypt() {
 
 
@@ -30,7 +30,7 @@ public class Encryption {
             kpg.initialize(1024);
             KeyPair kp = kpg.generateKeyPair();
 
-            PGPKeyPair pair2 = new PGPKeyPair()
+            PGPKeyPair pair2 = new PGPKeyPair();
             PGPKeyPair pair = new PGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, kp, new Date(), "BC");
 
 
@@ -38,7 +38,7 @@ public class Encryption {
 
             PGPKeyPair rsaKeyPair = new PGPKeyPair(PGPPublicKey.RSA_SIGN, rsaKp, new Date(), "BC");
 
-            PGPPublicKey myKey = new PGPPublicKey()
+            PGPPublicKey myKey = new PGPPublicKey();
 
             edGen.addMethod(PGPPublicKey.ELGAMAL_ENCRYPT);
 
@@ -59,6 +59,6 @@ public class Encryption {
 
 
     }
-
+*/
 
 }
