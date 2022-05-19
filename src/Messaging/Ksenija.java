@@ -56,7 +56,7 @@ public class Ksenija {
             PublicKey myPublicKey = keyPair.getPublic();
 
 
-            ElGamalParameters elParams = new ElGamalParameters(myPublicKey);
+            //ElGamalParameters elParams = new ElGamalParameters(myPublicKey);
 
 
 
@@ -74,7 +74,7 @@ public class Ksenija {
 
             ElGamalEngine ege = new ElGamalEngine();
 
-            ege.init(true, );
+            //ege.init(true, );
 
             Cipher cipher = Cipher.getInstance(DSA);
 
