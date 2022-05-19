@@ -1,11 +1,14 @@
 package Messaging;
 
 import org.bouncycastle.openpgp.*;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.security.KeyStore;
-import java.time.LocalDate;
+import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
+
 
 public class KeyRings {
 
@@ -32,7 +35,17 @@ public class KeyRings {
         //ovde ubaciti kod za generisanje kljuceva
     }
 
-    public void storePrivateKey(PGPSecretKey _privateKey, String _password){
+    public void storeToPrivateKeyRing(InputStream _stream){
+        PGPSecretKeyRing newKey;
+
+        BufferedInputStream stream_buff = new BufferedInputStream(_stream);
+
+        stream_buff.mark(1024 * 128);//ne znam zasto
+
+        PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRing, new PGPSecretKeyRing((List<PGPSecretKey>) stream_buff));
+    }
+
+    public void storeToPublicKeyRing(PGPPublicKey _publicKey, String _password){
 
 
 
