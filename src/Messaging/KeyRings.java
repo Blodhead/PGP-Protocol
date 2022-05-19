@@ -29,18 +29,12 @@ import java.util.Date;
 
 public class KeyRings {
 
-    private static PGPSecretKeyRingCollection privateKeyRing;
-    private static PGPPublicKeyRingCollection publicKeyRing;
+    private static PGPSecretKeyRing privateKeyRing;
+    private static PGPPublicKeyRing publicKeyRing;
 
     KeyRings(){
-        try {
-            privateKeyRing = new PGPSecretKeyRingCollection(Collections.EMPTY_LIST);
-            publicKeyRing  = new PGPPublicKeyRingCollection(Collections.EMPTY_LIST);
-        }
-        catch (IOException | PGPException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        privateKeyRing = new PGPSecretKeyRing(Collections.EMPTY_LIST);
+        publicKeyRing  = new PGPPublicKeyRing(Collections.EMPTY_LIST);
     }
 
     private static void generateNewKeyPair(int size){
@@ -62,6 +56,9 @@ public class KeyRings {
 
             PGPPublicKey bPublicKey = new JcaPGPKeyConverter().getPGPPublicKey(PGPPublicKey.ELGAMAL_ENCRYPT, publicKey, new Date());
             PGPPrivateKey bPprivateKey = new JcaPGPKeyConverter().getPGPPrivateKey(bPublicKey, privateKey);
+
+            PGPPublicKeyRing.insertPublicKey(publicKeyRing, bPublicKey);
+//            PGPSecretKeyRing.insertSecretKey(privateKeyRing, );
 
 
         } catch (NoSuchAlgorithmException e) {
@@ -94,7 +91,7 @@ public class KeyRings {
 
         stream_buff.mark(1024 * 128);//ne znam zasto
 
-        PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRing, new PGPSecretKeyRing((List<PGPSecretKey>) stream_buff));
+//        PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRing, new PGPSecretKeyRing((List<PGPSecretKey>) stream_buff));
     }
 
     public void storeToPublicKeyRing(PGPPublicKey _publicKey, String _password){
