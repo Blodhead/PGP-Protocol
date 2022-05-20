@@ -2,6 +2,8 @@ package App;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -18,6 +20,15 @@ public class View_User extends JFrame {
     private final JPanel p1 = new JPanel();
     private final JPanel p2 = new JPanel();
     private final JPanel p3 = new JPanel();
+    private JCheckBox opt_encryption_check;
+
+    private JCheckBox opt_authentication_check;
+    private JComboBox encryption_algorithm;
+    private JScrollPane private_key_pool;
+    private JScrollPane public_key_pool;
+
+    private JPasswordField pass;
+
     private View_User() {
         super("Pretty Good Privacy protocol");
 
@@ -47,10 +58,11 @@ public class View_User extends JFrame {
         fill_tab2();
         fill_tab3();
 
+        add_action_listeners();
+
         this.setVisible(true);
         this.setResizable(false);
     }
-
 private void fill_space() {
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,188 +84,194 @@ private void fill_space() {
     p3.setLayout(new BorderLayout());
 
 }
-
 private void fill_tab1(){
         //Message Sending
     JPanel form = new JPanel(new BorderLayout(2,2)); //new BorderLayout(2,2)
     form.setBorder(new TitledBorder(""));
 
     //////////////////////////////////PLAINTEXT////////////////////////////////////////////
-    JPanel text_panel = new JPanel(new FlowLayout());
-    text_panel.setBorder(new TitledBorder(""));
+    {
+        JPanel text_panel = new JPanel(new FlowLayout());
+        text_panel.setBorder(new TitledBorder(""));
 
-    JLabel plaintext = new JLabel("Enter plaintext:");
-    plaintext.setFont(new Font("Texas", Font.BOLD,20));
-    text_panel.add(plaintext);
+        JLabel plaintext = new JLabel("Enter plaintext:");
+        plaintext.setFont(new Font("Texas", Font.BOLD, 20));
+        text_panel.add(plaintext);
 
-    JTextField plaintext_field = new JTextField();
-    plaintext_field.setPreferredSize(new Dimension(750,40));
-    plaintext_field.setFont(new Font("Texas", Font.PLAIN,12));
-    text_panel.add(plaintext_field);
+        JTextField plaintext_field = new JTextField();
+        plaintext_field.setPreferredSize(new Dimension(750, 40));
+        plaintext_field.setFont(new Font("Texas", Font.PLAIN, 12));
+        text_panel.add(plaintext_field);
 
-    form.add(text_panel, BorderLayout.NORTH);
-
+        form.add(text_panel, BorderLayout.NORTH);
+    }
     //////////////////////////////////OPTIONS///////////////////////////////////////////////
-
-    JPanel options = new JPanel(new GridLayout(1,3));
-    TitledBorder t1 = new TitledBorder("Options: ");
-    t1.setTitleFont(new Font("Texas", Font.BOLD,18));
-    options.setBorder(t1);
+    {
+        JPanel options = new JPanel(new GridLayout(1, 3));
+        TitledBorder t1 = new TitledBorder("Options: ");
+        t1.setTitleFont(new Font("Texas", Font.BOLD, 18));
+        options.setBorder(t1);
 
         ///////////////////////////////Encryption///////////////////////////////////////
-        JPanel opt_encryption = new JPanel(new BorderLayout());
-        opt_encryption.setBorder(new TitledBorder(""));
-
-        JPanel opt_encryption_header = new JPanel(new FlowLayout());
-
-        JCheckBox opt_encryption_check = new JCheckBox("");
-
-        JLabel opt_encryption_label = new JLabel("Encryption:");
-        opt_encryption_label.setFont(new Font("Texas", Font.BOLD,18));
-
-        opt_encryption_header.add(opt_encryption_check);
-        opt_encryption_header.add(opt_encryption_label);
-        opt_encryption.add(opt_encryption_header, BorderLayout.NORTH);
-
-        JPanel opt_encryption_body = new JPanel(new GridBagLayout());
-        GridBagConstraints c0 = new GridBagConstraints();
-        c0.fill = GridBagConstraints.HORIZONTAL;
-        c0.gridx = 0;
-        c0.gridy = 0;
-
-        JLabel choose_enc_text = new JLabel("Choose encryption algorithm: ");
-        choose_enc_text.setFont(new Font("Texas", Font.ITALIC, 18));
-        opt_encryption_body.add(choose_enc_text,c0);
         {
-            c0.gridx = 1;
-            opt_encryption_body.add(new JPanel(), c0);
+            JPanel opt_encryption = new JPanel(new BorderLayout());
+            opt_encryption.setBorder(new TitledBorder(""));
+
+            JPanel opt_encryption_header = new JPanel(new FlowLayout());
+
+            opt_encryption_check = new JCheckBox("");
+            opt_encryption_check.setSelected(true);
+
+            JLabel opt_encryption_label = new JLabel("Encryption:");
+            opt_encryption_label.setFont(new Font("Texas", Font.BOLD, 18));
+
+            opt_encryption_header.add(opt_encryption_check);
+            opt_encryption_header.add(opt_encryption_label);
+            opt_encryption.add(opt_encryption_header, BorderLayout.NORTH);
+
+            JPanel opt_encryption_body = new JPanel(new BorderLayout());
+
+            opt_encryption_body.add(new JPanel());
+
+            JPanel wrap = new JPanel(new BorderLayout());
+            JPanel temp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel choose_enc_text = new JLabel("Choose encryption algorithm: ");
+            choose_enc_text.setFont(new Font("Texas", Font.ITALIC, 18));
+            temp.add(choose_enc_text);
+
+            String[] encryption_algorithms = {"3DES", "IDEA"};
+            encryption_algorithm = new JComboBox(encryption_algorithms);
+            temp.add(encryption_algorithm);
+
+            wrap.add(temp, BorderLayout.NORTH);
+            wrap.add(new JPanel(), BorderLayout.SOUTH);
+
+            opt_encryption_body.add(wrap, BorderLayout.NORTH);
+
+            JPanel temp2 = new JPanel(new BorderLayout());
+            JLabel choose_enc_key = new JLabel("Choose public DSA key: ");
+            choose_enc_key.setFont(new Font("Texas", Font.ITALIC, 17));
+            temp2.add(choose_enc_key, BorderLayout.NORTH);
+
+            JList lista = new JList();
+            private_key_pool = new JScrollPane(lista);
+            private_key_pool.setPreferredSize(new Dimension(300, 500));
+            temp2.add(private_key_pool, BorderLayout.CENTER);
+            opt_encryption_body.add(temp2, BorderLayout.CENTER);
+
+            opt_encryption.add(opt_encryption_body, BorderLayout.CENTER);
+
+            options.add(opt_encryption);
         }
-        c0.gridx = 2;
-        String []encryption_algorithms = {"3DES","IDEA"};
-        JComboBox encryption_algorithm = new JComboBox(encryption_algorithms);
-        opt_encryption_body.add(encryption_algorithm,c0);
-        {
-            c0.gridx = 0;
-            c0.gridy = 1;
-            opt_encryption_body.add(new JPanel(), c0);
-            c0.gridy = 2;
-            opt_encryption_body.add(new JPanel(), c0);
-            c0.gridy = 3;
-            opt_encryption_body.add(new JPanel(), c0);
-            c0.gridy = 4;
-            opt_encryption_body.add(new JPanel(), c0);
-            c0.gridy = 5;
-            opt_encryption_body.add(new JPanel(), c0);
-            c0.gridy = 6;
-            opt_encryption_body.add(new JPanel(), c0);
-            c0.gridy = 7;
-            opt_encryption_body.add(new JPanel(), c0);
-
-        }
-        c0.gridy = 8;
-
-        JLabel choose_enc_key = new JLabel("Choose DSA key: ");
-        choose_enc_key.setFont(new Font("Texas", Font.ITALIC, 18));
-        opt_encryption_body.add(choose_enc_key,c0);
-
-        JList lista = new JList();
-        JScrollPane key_pool = new JScrollPane(lista);
-        key_pool.setPreferredSize(new Dimension(300,500));
-
-        c0.gridy = 9;
-
-        opt_encryption_body.add(key_pool,c0);
-
-
-        opt_encryption.add(opt_encryption_body, BorderLayout.CENTER);
-
-        options.add(opt_encryption);
-
-
         ///////////////////////////////Authentication////////////////////////////////////
-    {
-        JPanel opt_authentication = new JPanel(new BorderLayout());
-        opt_authentication.setBorder(new TitledBorder(""));
-
-        JPanel opt_authentication_header = new JPanel(new FlowLayout());
-
-        JCheckBox opt_authentication_check = new JCheckBox("");
-
-        JLabel opt_authentication_label = new JLabel("Authentication:");
-        opt_authentication_label.setFont(new Font("Texas", Font.BOLD, 18));
-
-        opt_authentication_header.add(opt_authentication_check);
-        opt_authentication_header.add(opt_authentication_label);
-        opt_authentication.add(opt_authentication_header, BorderLayout.NORTH);
-
-        JPanel opt_authentication_body = new JPanel();
-        opt_authentication_body.add(new JLabel("alihdsiwql"));
-
-        opt_authentication.add(opt_authentication_body, BorderLayout.CENTER);
-
-
-        options.add(opt_authentication);
-    }
-
-        ////////////////////////////////Additional////////////////////////////////////////
-
-    {
-        JPanel opt_additional = new JPanel(new BorderLayout());
-        opt_additional.setBorder(new TitledBorder(""));
-
-        JPanel opt_additional_header = new JPanel(new FlowLayout());
-
-        JLabel opt_additional_label = new JLabel("Additional:");
-        opt_additional_label.setFont(new Font("Texas", Font.BOLD, 18));
-
-        opt_additional_header.add(opt_additional_label);
-        opt_additional.add(opt_additional_header, BorderLayout.NORTH);
-
-        JPanel opt_additional_body = new JPanel(new GridBagLayout());
-        JCheckBox zip = new JCheckBox("Zip compressions");
-        zip.setFont(new Font("Texas", Font.ITALIC, 18));
-        JCheckBox radix64 = new JCheckBox("Radix64 conversion");
-        System.out.println(radix64.getLocation());
-        radix64.setFont(new Font("Texas", Font.ITALIC, 18));
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 0;
-        opt_additional_body.add(zip, c);
-
         {
-            c.gridy = 1;
-            opt_additional_body.add(new JPanel(), c);
-            c.gridy = 2;
-            opt_additional_body.add(new JPanel(), c);
-            c.gridy = 3;
-            opt_additional_body.add(new JPanel(), c);
-            c.gridy = 4;
-            opt_additional_body.add(new JPanel(), c);
-            c.gridy = 5;
-            opt_additional_body.add(new JPanel(), c);
-            c.gridy = 6;
-            opt_additional_body.add(new JPanel(), c);
+            JPanel opt_authentication = new JPanel(new BorderLayout());
+            opt_authentication.setBorder(new TitledBorder(""));
+
+            JPanel opt_authentication_header = new JPanel(new FlowLayout());
+
+            opt_authentication_check = new JCheckBox("");
+            opt_authentication_check.setSelected(true);
+
+            JLabel opt_authentication_label = new JLabel("Authentication:");
+            opt_authentication_label.setFont(new Font("Texas", Font.BOLD, 18));
+
+            opt_authentication_header.add(opt_authentication_check);
+            opt_authentication_header.add(opt_authentication_label);
+            opt_authentication.add(opt_authentication_header, BorderLayout.NORTH);
+
+            JPanel opt_authentication_body = new JPanel(new BorderLayout());
+
+            JPanel wrapping = new JPanel(new BorderLayout());
+            JPanel temp1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel choose_enc_text1 = new JLabel("Password: ");
+            choose_enc_text1.setFont(new Font("Texas", Font.ITALIC, 18));
+            temp1.add(choose_enc_text1);
+
+            pass = new JPasswordField();
+            pass.setPreferredSize(new Dimension(250, 25));
+            temp1.add(pass);
+            wrapping.add(temp1, BorderLayout.NORTH);
+            wrapping.add(new JPanel(), BorderLayout.SOUTH);
+
+
+            JPanel temp3 = new JPanel(new BorderLayout());
+            JLabel choose_aut_key = new JLabel("Choose private DSA key: ");
+            choose_aut_key.setFont(new Font("Texas", Font.ITALIC, 17));
+            temp3.add(choose_aut_key, BorderLayout.NORTH);
+
+            JList lista2 = new JList(); ///LISTA JAVNIH KLJUCEVA
+            public_key_pool = new JScrollPane(lista2);
+            public_key_pool.setPreferredSize(new Dimension(300, 500));
+            temp3.add(public_key_pool, BorderLayout.CENTER);
+            opt_authentication_body.add(temp3, BorderLayout.CENTER);
+
+
+            opt_authentication_body.add(wrapping, BorderLayout.NORTH);
+
+            opt_authentication.add(opt_authentication_body, BorderLayout.CENTER);
+
+
+            options.add(opt_authentication);
+        }
+        ////////////////////////////////Additional////////////////////////////////////////
+        {
+            JPanel opt_additional = new JPanel(new BorderLayout());
+            opt_additional.setBorder(new TitledBorder(""));
+
+            JPanel opt_additional_header = new JPanel(new FlowLayout());
+
+            JLabel opt_additional_label = new JLabel("Additional:");
+            opt_additional_label.setFont(new Font("Texas", Font.BOLD, 18));
+
+            opt_additional_header.add(opt_additional_label);
+            opt_additional.add(opt_additional_header, BorderLayout.NORTH);
+
+            JPanel opt_additional_body = new JPanel(new GridBagLayout());
+            JCheckBox zip = new JCheckBox("Zip compressions");
+            zip.setFont(new Font("Texas", Font.ITALIC, 18));
+            JCheckBox radix64 = new JCheckBox("Radix64 conversion");
+            System.out.println(radix64.getLocation());
+            radix64.setFont(new Font("Texas", Font.ITALIC, 18));
+
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.gridx = 0;
+            c.gridy = 0;
+            opt_additional_body.add(zip, c);
+
+            {
+                c.gridy = 1;
+                opt_additional_body.add(new JPanel(), c);
+                c.gridy = 2;
+                opt_additional_body.add(new JPanel(), c);
+                c.gridy = 3;
+                opt_additional_body.add(new JPanel(), c);
+                c.gridy = 4;
+                opt_additional_body.add(new JPanel(), c);
+                c.gridy = 5;
+                opt_additional_body.add(new JPanel(), c);
+                c.gridy = 6;
+                opt_additional_body.add(new JPanel(), c);
+            }
+
+            c.gridy = 7;
+            opt_additional_body.add(radix64, c);
+
+            opt_additional.add(opt_additional_body, BorderLayout.CENTER);
+            options.add(opt_additional);
         }
 
-        c.gridy = 7;
-        opt_additional_body.add(radix64,c);
-
-        opt_additional.add(opt_additional_body, BorderLayout.CENTER);
-        options.add(opt_additional);
+        form.add(options, BorderLayout.CENTER);
     }
-
-    form.add(options,BorderLayout.CENTER);
-
     //////////////////////////////////SEND//////////////////////////////////////////////////
-
-    JPanel send_panel = new JPanel(new FlowLayout());
-    JButton send = new JButton("Send");
-    send.setPreferredSize(new Dimension(100,40));
-    send_panel.add(send);
-    form.add(send_panel,BorderLayout.SOUTH);
-
+    {
+        JPanel send_panel = new JPanel(new FlowLayout());
+        JButton send = new JButton("Send");
+        send.setPreferredSize(new Dimension(100, 40));
+        send_panel.add(send);
+        form.add(send_panel, BorderLayout.SOUTH);
+    }
     p1.add(form);
 
 }
@@ -286,6 +304,36 @@ private void fill_tab2(){
 
 }
 private void fill_tab3(){}
+
+private void add_action_listeners() {
+    opt_encryption_check.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(!opt_encryption_check.isSelected()){
+                encryption_algorithm.setEnabled(false);
+                private_key_pool.setEnabled(false);
+            }else{
+                encryption_algorithm.setEnabled(true);
+                private_key_pool.setEnabled(true);
+            }
+        }
+    });
+
+    opt_authentication_check.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(!opt_authentication_check.isSelected()){
+                pass.setEnabled(false);
+                public_key_pool.setEnabled(false);
+            }else{
+                pass.setEnabled(true);
+                public_key_pool.setEnabled(true);
+            }
+        }
+    });
+
+}
+
 
     public static void getUser_view() {//bice pozvana samo jednom
         new View_User();
