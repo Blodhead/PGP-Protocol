@@ -221,7 +221,7 @@ private void fill_tab1(){
 
             JPanel opt_additional_header = new JPanel(new FlowLayout());
 
-            JLabel opt_additional_label = new JLabel("Additional:");
+            JLabel opt_additional_label = new JLabel("Additional options:");
             opt_additional_label.setFont(new Font("Texas", Font.BOLD, 18));
 
             opt_additional_header.add(opt_additional_label);
