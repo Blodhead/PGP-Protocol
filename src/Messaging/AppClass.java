@@ -13,7 +13,7 @@ public class AppClass {
     static { admin = Admin.getAdmin(); }
     public static void main(String[] args) {
 
-        KeyRings.generateNewKeyPair(1024);
+      //  KeyRings.generateNewKeyPair(1024);
 
 
         String msg = "";
