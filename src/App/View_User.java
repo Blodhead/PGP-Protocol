@@ -328,7 +328,7 @@ private void fill_tab3(){
 
         JLabel key_gen_label = new JLabel("Key generation:");
         key_gen_label.setFont(new Font("Texas", Font.BOLD, 18));
-        key_gen_label.setBounds(90, 30, 250, 25);
+        key_gen_label.setBounds(80, 30, 250, 25);
         gen_panel.add(key_gen_label);
 
         JLabel name_txt = new JLabel("Name: ");
@@ -377,36 +377,96 @@ private void fill_tab3(){
         adition.add(gen_panel, BorderLayout.WEST);
     }
 
-/////////////////////////////TABLES////////////////////////////////////////
+    //////////////////////TABLES///////////////////////////
 
-    JLabel priv_key = new JLabel("Private key ring:");
-    priv_key.setFont(myFont);
-    priv_key.setBounds(100,10,150,25);
-    show_panel.add(priv_key);
+    {
+        JLabel priv_key = new JLabel("Private key ring:");
+        priv_key.setFont(myFont);
+        priv_key.setBounds(100, 10, 150, 25);
+        show_panel.add(priv_key);
 
-    private_key_pool1 = new JScrollPane();
-    JList<String> lista4 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
-    private_key_pool1 = new JScrollPane(lista4);
-    private_key_pool1.setBounds(100,40,300,330);
-    show_panel.add(private_key_pool1);
+        JList<String> lista4 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+        private_key_pool1 = new JScrollPane(lista4);
+        private_key_pool1.setBounds(100, 40, 300, 330);
+        show_panel.add(private_key_pool1);
 
-    JLabel publ_key = new JLabel("Public key ring:");
-    publ_key.setFont(myFont);
-    publ_key.setBounds(530,10,150,25);
-    show_panel.add(publ_key);
+        JLabel publ_key = new JLabel("Public key ring:");
+        publ_key.setFont(myFont);
+        publ_key.setBounds(530, 10, 150, 25);
+        show_panel.add(publ_key);
 
-    public_key_pool1 = new JScrollPane();
-    JList<String> lista3 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
-    public_key_pool1 = new JScrollPane(lista3);
-    public_key_pool1.setBounds(530,40,300,330);
-    show_panel.add(public_key_pool1);
+        JList<String> lista3 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+        public_key_pool1 = new JScrollPane(lista3);
+        public_key_pool1.setEnabled(false);
+        public_key_pool1.setBounds(530, 40, 300, 330);
+        show_panel.add(public_key_pool1);
+    }
 
-///////////////////////////////////BUTTONS///////////////////////////////////////////////////////
-    JPanel selection = new JPanel();
-    selection.setPreferredSize(new Dimension(800,300));
-    selection.setBorder(new TitledBorder(""));
-    adition.add(selection,BorderLayout.SOUTH);
+    /////////////////////Miscellaneous///////////////////////////
+    {
+        JPanel selection = new JPanel(new GridLayout(1, 3));
+        selection.setPreferredSize(new Dimension(800, 300));
+        selection.setBorder(new TitledBorder(""));
 
+        JPanel export_key = new JPanel(null);
+        ///////////////////////////////EXPORT//////////////////////////////
+        {
+
+            TitledBorder t1 = new TitledBorder("Export:");
+            t1.setTitleFont(new Font("Texas", Font.BOLD, 18));
+            export_key.setBorder(t1);
+
+            JLabel exp_txt = new JLabel("Export selected key to: ");
+            exp_txt.setFont(new Font("Texas", Font.PLAIN, 15));
+            exp_txt.setBounds(20, 30, 200, 25);
+            export_key.add(exp_txt);
+
+            JButton exp_button = new JButton("Export");
+            exp_button.setBounds(170, 230, 100, 30);
+            export_key.add(exp_button);
+
+        }
+        JPanel import_key = new JPanel(null);
+        ///////////////////////////////IMPORT//////////////////////////////
+        {
+            TitledBorder t2 = new TitledBorder("Import:");
+            t2.setTitleFont(new Font("Texas", Font.BOLD, 18));
+            import_key.setBorder(t2);
+
+            JLabel imp_txt = new JLabel("Import selected key from: ");
+            imp_txt.setFont(new Font("Texas", Font.PLAIN, 15));
+            imp_txt.setBounds(20, 30, 200, 25);
+            import_key.add(imp_txt);
+
+            JButton imp_button = new JButton("Import");
+            imp_button.setBounds(170, 230, 100, 30);
+            import_key.add(imp_button);
+        }
+        JPanel delete_key = new JPanel(null);
+        ///////////////////////////////DELETION////////////////////////////
+        {
+            TitledBorder t3 = new TitledBorder("Delete:");
+            t3.setTitleFont(new Font("Texas", Font.BOLD, 18));
+            delete_key.setBorder(t3);
+
+            JLabel del_txt = new JLabel("Delete selected key: ");
+            del_txt.setFont(new Font("Texas", Font.PLAIN, 15));
+            del_txt.setBounds(20, 30, 200, 25);
+            delete_key.add(del_txt);
+
+            JButton del_button = new JButton("Delete");
+            del_button.setBounds(170, 230, 100, 30);
+            delete_key.add(del_button);
+        }
+
+
+        selection.add(import_key);
+        selection.add(export_key);
+        selection.add(delete_key);
+
+
+        adition.add(selection, BorderLayout.SOUTH);
+    }
     p3.add(adition);
 
 }
