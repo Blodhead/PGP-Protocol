@@ -6,6 +6,7 @@ import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPPrivateKey;
 
 
 import java.io.BufferedInputStream;
@@ -37,10 +38,10 @@ public class KeyRings {
         publicKeyRing  = new PGPPublicKeyRing(Collections.EMPTY_LIST);
     }
 
-    private static void generateNewKeyPair(int size){
+    public static void generateNewKeyPair(int size){
 
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", "BC");
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", Admin.getProvider());
 
             kpg.initialize(size);
             KeyPair kp = kpg.generateKeyPair();
@@ -55,15 +56,24 @@ public class KeyRings {
             PrivateKey privateKey = keyPair.getPrivate();
 
             PGPPublicKey bPublicKey = new JcaPGPKeyConverter().getPGPPublicKey(PGPPublicKey.ELGAMAL_ENCRYPT, publicKey, new Date());
-            PGPPrivateKey bPprivateKey = new JcaPGPKeyConverter().getPGPPrivateKey(bPublicKey, privateKey);
 
-            PGPPublicKeyRing.insertPublicKey(publicKeyRing, bPublicKey);
+//            JcaPGPPrivateKey jpk = new JcaPGPPrivateKey(bPublicKey, privateKey);
+
+            PGPPrivateKey bpk = new JcaPGPKeyConverter().getPGPPrivateKey(bPublicKey, privateKey);
+
+//            PGPPrivateKey bPrivateKey = (new JcaPGPPrivateKey(bPublicKey, privateKey)).getPrivateKey();
+//
+//            PGPPrivateKey bPprivateKey = new JcaPGPKeyConverter().getPGPPrivateKey(bPublicKey, privateKey);
+//
+//            PGPPublicKeyRing.insertPublicKey(publicKeyRing, bPublicKey);
+
+
+
+
 //            PGPSecretKeyRing.insertSecretKey(privateKeyRing, );
 
 
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         } catch (PGPException e) {
             e.printStackTrace();

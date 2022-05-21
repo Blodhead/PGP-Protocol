@@ -8,8 +8,14 @@ public class AppClass {
     User ksenija = new User();
     User milos = new User();
 
-    Admin admin = Admin.getAdmin();
+    static Admin admin;
+
+    static { admin = Admin.getAdmin(); }
     public static void main(String[] args) {
+
+      //  KeyRings.generateNewKeyPair(1024);
+
+
         String msg = "";
         System.out.println("Hello world");
 
