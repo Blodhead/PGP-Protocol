@@ -2,8 +2,6 @@ package App;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -23,13 +21,15 @@ public class View_User extends JFrame {
     private JCheckBox opt_encryption_check;
 
     private JCheckBox opt_authentication_check;
-    private JComboBox encryption_algorithm;
+    private JComboBox<String> encryption_algorithm;
     private JScrollPane private_key_pool;
+    private JScrollPane private_key_pool1;
     private JScrollPane public_key_pool;
+    private JScrollPane public_key_pool1;
 
     private JPasswordField pass;
 
-    private View_User() {
+private View_User() {
         super("Pretty Good Privacy protocol");
 
         //Setting up look and feel, in other words the theme of our App
@@ -140,7 +140,7 @@ private void fill_tab1(){
             temp.add(choose_enc_text);
 
             String[] encryption_algorithms = {"3DES", "IDEA"};
-            encryption_algorithm = new JComboBox(encryption_algorithms);
+            encryption_algorithm = new JComboBox<>(encryption_algorithms);
             temp.add(encryption_algorithm);
 
             wrap.add(temp, BorderLayout.NORTH);
@@ -153,7 +153,7 @@ private void fill_tab1(){
             choose_enc_key.setFont(new Font("Texas", Font.ITALIC, 17));
             temp2.add(choose_enc_key, BorderLayout.NORTH);
 
-            JList lista = new JList();
+            JList<String> lista = new JList<>();
             private_key_pool = new JScrollPane(lista);
             private_key_pool.setPreferredSize(new Dimension(300, 500));
             temp2.add(private_key_pool, BorderLayout.CENTER);
@@ -200,7 +200,7 @@ private void fill_tab1(){
             choose_aut_key.setFont(new Font("Texas", Font.ITALIC, 17));
             temp3.add(choose_aut_key, BorderLayout.NORTH);
 
-            JList lista2 = new JList(); ///LISTA JAVNIH KLJUCEVA
+            JList<String> lista2 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
             public_key_pool = new JScrollPane(lista2);
             public_key_pool.setPreferredSize(new Dimension(300, 500));
             temp3.add(public_key_pool, BorderLayout.CENTER);
@@ -303,32 +303,133 @@ private void fill_tab2(){
     p2.add(form, BorderLayout.CENTER);
 
 }
-private void fill_tab3(){}
+private void fill_tab3(){
+
+    JPanel adition = new JPanel(new BorderLayout());
+    adition.setBorder(new TitledBorder(""));
+
+    JPanel show_panel = new JPanel(null);
+    show_panel.setBorder(new TitledBorder(""));
+
+    JPanel del_panel = new JPanel();
+    del_panel.setBorder(new TitledBorder(""));
+
+
+    adition.add(show_panel, BorderLayout.CENTER);
+
+    Font myFont = new Font("Texas", Font.ITALIC, 18);
+    JPanel gen_panel = new JPanel(new BorderLayout());
+
+    //////////////////////GENERATE KEYS////////////////////
+
+    {
+        JPanel gen_form = new JPanel(null);
+        gen_form.setBorder(new TitledBorder(""));
+
+        JLabel key_gen_label = new JLabel("Key generation:");
+        key_gen_label.setFont(new Font("Texas", Font.BOLD, 18));
+        key_gen_label.setBounds(90, 30, 250, 25);
+        gen_panel.add(key_gen_label);
+
+        JLabel name_txt = new JLabel("Name: ");
+        name_txt.setBounds(20, 100, 70, 20);
+        name_txt.setFont(myFont);
+        gen_form.add(name_txt);
+
+        JTextField name = new JTextField();
+        name.setBounds(120, 98, 150, 30);
+        gen_form.add(name);
+
+        JLabel mail_text = new JLabel("E-mail: ");
+        mail_text.setBounds(20, 150, 70, 20);
+        mail_text.setFont(myFont);
+        gen_form.add(mail_text);
+
+        JTextField mail = new JTextField();
+        mail.setBounds(120, 148, 150, 30);
+        gen_form.add(mail);
+
+        JLabel pass_text = new JLabel("Password: ");
+        pass_text.setBounds(20, 200, 100, 20);
+        pass_text.setFont(myFont);
+        gen_form.add(pass_text);
+
+        JPasswordField pass_field = new JPasswordField();
+        pass_field.setBounds(120, 198, 150, 30);
+        gen_form.add(pass_field);
+
+        JLabel dsa_choose_txt = new JLabel("DSA size: ");
+        dsa_choose_txt.setBounds(20, 250, 100, 20);
+        dsa_choose_txt.setFont(myFont);
+        gen_form.add(dsa_choose_txt);
+
+        String[] dsa_choice_opt = {"1024", "2048", "4096"};
+        JComboBox dsa_choice = new JComboBox<>(dsa_choice_opt);
+        dsa_choice.setBounds(140, 248, 100, 30);
+        gen_form.add(dsa_choice);
+
+        gen_form.setPreferredSize(new Dimension(300, 500));
+        gen_panel.add(gen_form, BorderLayout.CENTER);
+
+        JButton generate = new JButton("Generate");
+        generate.setPreferredSize(new Dimension(100,40));
+        gen_panel.add(generate, BorderLayout.SOUTH);
+        adition.add(gen_panel, BorderLayout.WEST);
+    }
+
+/////////////////////////////TABLES////////////////////////////////////////
+
+    JLabel priv_key = new JLabel("Private key ring:");
+    priv_key.setFont(myFont);
+    priv_key.setBounds(100,10,150,25);
+    show_panel.add(priv_key);
+
+    private_key_pool1 = new JScrollPane();
+    JList<String> lista4 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+    private_key_pool1 = new JScrollPane(lista4);
+    private_key_pool1.setBounds(100,40,300,330);
+    show_panel.add(private_key_pool1);
+
+    JLabel publ_key = new JLabel("Public key ring:");
+    publ_key.setFont(myFont);
+    publ_key.setBounds(530,10,150,25);
+    show_panel.add(publ_key);
+
+    public_key_pool1 = new JScrollPane();
+    JList<String> lista3 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+    public_key_pool1 = new JScrollPane(lista3);
+    public_key_pool1.setBounds(530,40,300,330);
+    show_panel.add(public_key_pool1);
+
+///////////////////////////////////BUTTONS///////////////////////////////////////////////////////
+    JPanel selection = new JPanel();
+    selection.setPreferredSize(new Dimension(800,300));
+    selection.setBorder(new TitledBorder(""));
+    adition.add(selection,BorderLayout.SOUTH);
+
+    p3.add(adition);
+
+}
 
 private void add_action_listeners() {
-    opt_encryption_check.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(!opt_encryption_check.isSelected()){
-                encryption_algorithm.setEnabled(false);
-                private_key_pool.setEnabled(false);
-            }else{
-                encryption_algorithm.setEnabled(true);
-                private_key_pool.setEnabled(true);
-            }
+
+    opt_encryption_check.addActionListener(e -> {
+        if(!opt_encryption_check.isSelected()){
+            encryption_algorithm.setEnabled(false);
+            private_key_pool.setEnabled(false);
+        }else{
+            encryption_algorithm.setEnabled(true);
+            private_key_pool.setEnabled(true);
         }
     });
 
-    opt_authentication_check.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(!opt_authentication_check.isSelected()){
-                pass.setEnabled(false);
-                public_key_pool.setEnabled(false);
-            }else{
-                pass.setEnabled(true);
-                public_key_pool.setEnabled(true);
-            }
+    opt_authentication_check.addActionListener(e -> {
+        if(!opt_authentication_check.isSelected()){
+            pass.setEnabled(false);
+            public_key_pool.setEnabled(false);
+        }else{
+            pass.setEnabled(true);
+            public_key_pool.setEnabled(true);
         }
     });
 
