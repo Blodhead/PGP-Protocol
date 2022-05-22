@@ -6,6 +6,7 @@ import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPPrivateKey;
 
 
@@ -21,6 +22,7 @@ import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.DHParameterSpec;
 import java.io.IOException;
 import java.security.*;
 import java.time.LocalDate;
@@ -30,16 +32,71 @@ import java.util.Date;
 
 public class KeyRings {
 
-    private static PGPSecretKeyRing privateKeyRing;
-    private static PGPPublicKeyRing publicKeyRing;
+    private static PGPSecretKeyRingCollection privateKeyRing;
+    private static PGPPublicKeyRingCollection publicKeyRing;
+
+    private static KeyPairGenerator DSAkpg = null;
+    private static KeyPairGenerator EGkpg = null;
 
     KeyRings(){
-        privateKeyRing = new PGPSecretKeyRing(Collections.EMPTY_LIST);
-        publicKeyRing  = new PGPPublicKeyRing(Collections.EMPTY_LIST);
+        try {
+            privateKeyRing = new PGPSecretKeyRingCollection(Collections.EMPTY_LIST);
+            publicKeyRing  = new PGPPublicKeyRingCollection(Collections.EMPTY_LIST);
+
+            DSAkpg = KeyPairGenerator.getInstance("DSA", "BC");
+            DSAkpg.initialize(1024);
+
+            EGkpg = KeyPairGenerator.getInstance("ELGAMAL", "BC");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (PGPException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void generateNewKeyPair(int size){
+    public static void generateNewKeyPair(String algo, int size, String password){
+        try {
 
+            KeyPair kp;
+
+            if (algo.equals("DSA")) {
+                kp = DSAkpg.generateKeyPair();
+
+                PGPKeyPair DSAkp = new JcaPGPKeyPair(PGPPublicKey.DSA, kp, new Date());
+                
+
+            }
+            else if (algo.equals("ElGamal")) {
+                // podesavanje parametara za ElGamal
+                // videti kako se biraju parametri
+
+                BigInteger bi1 = new BigInteger("153d5d6172adb43045b68ae8e1de1070b6137005686d29d3d73a7749199681ee5b212c9b96bfdcfa5b20cd5e3fd2044895d609cf9b410b7a0f12ca1cb9a428cc", 16);
+                BigInteger bi2 = new BigInteger("9494fec095f3b85ee286542b3836fc81a5dd0a0349b4c239dd38744d488cf8e31db8bcb7d33b41abb9e5a33cca9144b1cef332c94bf0573bf047a3aca98cdf3b", 16);
+                DHParameterSpec dhParam = new DHParameterSpec(bi1, bi2);
+
+                EGkpg.initialize(dhParam);
+                kp = EGkpg.generateKeyPair();
+            }
+            else {
+                return;
+            }
+
+            PublicKey pub = kp.getPublic();
+            PGPPublicKeyRing pubKR = publicKeyRing
+
+        } catch (InvalidAlgorithmParameterException | PGPException e) {
+            e.printStackTrace();
+        }
+
+
+
+/*
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", Admin.getProvider());
 
@@ -86,6 +143,8 @@ public class KeyRings {
         //private String userId;                      //mail
         //private KeyStore.ProtectionParameter password;
         //ovde ubaciti kod za generisanje kljuceva
+
+ */
     }
 
 
