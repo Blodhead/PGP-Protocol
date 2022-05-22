@@ -2,6 +2,7 @@ package Messaging;
 
 import java.io.IOException;
 import App.*;
+
 //import Zipping.*;
 public class AppClass {
 
@@ -26,8 +27,9 @@ public class AppClass {
             throw new RuntimeException(e);
         }
 
-        View_User.getUser_view();
 
+
+        View_User.getUser_view();
     }
 
 

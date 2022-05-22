@@ -2,6 +2,8 @@ package App;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -10,8 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileSystemView;
+
+//import static javax.swing.JOptionPane.showMessageDialog; needed for messages alert
 
 public class View_User extends JFrame {
 
@@ -26,7 +31,8 @@ public class View_User extends JFrame {
     private JScrollPane private_key_pool1;
     private JScrollPane public_key_pool;
     private JScrollPane public_key_pool1;
-
+    private JButton exp_button;
+    private JButton imp_key_button;
     private JPasswordField pass;
 
 private View_User() {
@@ -280,25 +286,48 @@ private void fill_tab2(){
 
     JPanel form = new JPanel(new BorderLayout(2,2));
 
-    JPanel labelFields = new JPanel(new GridLayout(0,2,1,1));
-    labelFields.setBorder(new TitledBorder(""));
+
     JPanel fields = new JPanel(new GridLayout(0,2,1,1));
     fields.setBorder(new TitledBorder(""));
 
-    for (int ii=1; ii<8; ii++) {
-        labelFields.add(new JLabel("Label " + ii));
-        // if these were of different size, it would be necessary to
-        // constrain them using another panel
-        labelFields.add(new JTextField(10));
-    }
+    JLabel insert_text = new JLabel("Choose .asc file you want receive:",SwingConstants.CENTER);
+    insert_text.setFont(new Font("Texas",Font.ITALIC,20));
+    insert_text.setBorder(new EmptyBorder(10,0,0,0));
+    form.add(insert_text,BorderLayout.NORTH);
 
     JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+    form.add(j,BorderLayout.CENTER);
 
-    //labelFields.add(fields, BorderLayout.EAST);
+    JPanel labelFields = new JPanel(null);
+    labelFields.setBorder(new TitledBorder(""));
+    labelFields.setPreferredSize(new Dimension(800,180));
 
-    form.add(labelFields, BorderLayout.NORTH);
-    form.add(j);
-    //sgui.add(guiCenter, BorderLayout.CENTER);
+    JLabel ciphertext_label = new JLabel("Ciphertext: ");
+    ciphertext_label.setFont(new Font("Texas",Font.ITALIC,18));
+    ciphertext_label.setBounds(300,30,100,20);
+
+    JLabel plaintext_label = new JLabel("Plaintext: ");
+    plaintext_label.setFont(new Font("Texas",Font.ITALIC,18));
+    plaintext_label.setBounds(300,110,100,20);
+
+    JTextField ciphertext = new JTextField();
+    ciphertext.setBounds(400,30,500,30);
+    JTextField plaintext = new JTextField();
+    plaintext.setBounds(400,110,500,30);
+;
+
+    JButton decrypt = new JButton("Receive");
+    decrypt.setBounds(560,70,100,30);
+    labelFields.add(decrypt);
+
+///        showMessageDialog(null, "This is even shorter");
+
+    labelFields.add(ciphertext_label);
+    labelFields.add(plaintext_label);
+    labelFields.add(ciphertext);
+    labelFields.add(plaintext);
+
+    form.add(labelFields, BorderLayout.SOUTH);
 
     p2.add(form, BorderLayout.CENTER);
 
@@ -421,7 +450,7 @@ private void fill_tab3(){
             exp_txt.setBounds(20, 30, 200, 25);
             export_key.add(exp_txt);
 
-            JButton exp_button = new JButton("Export");
+            exp_button = new JButton("Export");
             exp_button.setBounds(170, 230, 100, 30);
             export_key.add(exp_button);
 
@@ -438,9 +467,10 @@ private void fill_tab3(){
             imp_txt.setBounds(20, 30, 200, 25);
             import_key.add(imp_txt);
 
-            JButton imp_button = new JButton("Import");
-            imp_button.setBounds(170, 230, 100, 30);
-            import_key.add(imp_button);
+            imp_key_button = new JButton("Import");
+            imp_key_button.setBounds(170, 230, 100, 30);
+            import_key.add(imp_key_button);
+
         }
         JPanel delete_key = new JPanel(null);
         ///////////////////////////////DELETION////////////////////////////
@@ -492,6 +522,63 @@ private void add_action_listeners() {
             public_key_pool.setEnabled(true);
         }
     });
+
+    exp_button.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent ae) {
+
+            JFileChooser chooser = new JFileChooser();
+
+            int returnVal = chooser.showOpenDialog(null);
+
+            if (returnVal != JFileChooser.APPROVE_OPTION)
+                return;
+
+            try {
+                /*if (Main.publicKeys.size() <= 0)
+                    return;*/
+                /*PPGPPrstenJavnihKljuceva k = (PPGPPrstenJavnihKljuceva) Main.publicKeys
+                        .get(exportJCh.getSelectedIndex());
+                saveKey(k.getPublicKeyRing().getEncoded());
+                poruka.setText("");*/
+            } catch (Exception ex) {
+                /*poruka.setText("ERROR: Javni kljuc nije eksportovan.");
+                ex.printStackTrace();*/
+            }
+
+        }
+    });
+
+    imp_key_button.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent ae) {
+            JFileChooser chooser = new JFileChooser();
+
+            int returnVal = chooser.showOpenDialog(null);
+
+            if (returnVal != JFileChooser.APPROVE_OPTION)
+                return;
+
+            try {
+                /*if (chckbxNewCheckBox.isSelected()) {
+                    PGPSecretKeyRing ring = PrstenKljuceva
+                            .importPrivateKey(new FileInputStream(chooser.getSelectedFile()));
+                    System.out.println("privatni");
+                } else {
+                    PGPPublicKeyRing ring = PrstenKljuceva
+                            .importPublicKey(new FileInputStream(chooser.getSelectedFile()));
+                    System.out.println("javni");
+                }*/
+                //poruka.setText("");
+            } catch (Exception ex) {
+                // ex.printStackTrace();
+                //poruka.setText("ERROR: Import nije uspeo.");
+            }
+
+            //updatePrivKeysList();
+            //updatePubKeysList();
+
+        }
+    });
+
 
 }
 
