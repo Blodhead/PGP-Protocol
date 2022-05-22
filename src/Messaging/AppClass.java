@@ -9,13 +9,14 @@ public class AppClass {
     User ksenija = new User();
     User milos = new User();
 
-    static Admin admin;
 
-    static { admin = Admin.getAdmin(); }
+
+
     public static void main(String[] args) {
 
       //  KeyRings.generateNewKeyPair(1024);
 
+        KeyRings kr = new KeyRings();
 
         String msg = "";
         System.out.println("Hello world");
