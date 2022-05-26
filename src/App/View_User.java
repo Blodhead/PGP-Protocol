@@ -1,5 +1,9 @@
 package App;
 
+import Messaging.KeyRings;
+import org.bouncycastle.openpgp.PGPException;
+
+import javax.crypto.KeyGenerator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -28,12 +32,22 @@ public class View_User extends JFrame {
     private JCheckBox opt_authentication_check;
     private JComboBox<String> encryption_algorithm;
     private JScrollPane private_key_pool;
-    private JScrollPane private_key_pool1;
+    public static JScrollPane private_key_pool1;
+    public static JScrollPane public_key_pool1;
+
+    public static JList<String> lista4;
+    public static JList<String> lista3;
+
     private JScrollPane public_key_pool;
-    private JScrollPane public_key_pool1;
     private JButton exp_button;
     private JButton imp_key_button;
     private JPasswordField pass;
+
+    private JTextField username;
+    private JTextField mail;
+    private JPasswordField pass_field;
+    private JComboBox dsa_choice;
+    private JButton generate_dsa;
 
 private View_User() {
         super("Pretty Good Privacy protocol");
@@ -365,16 +379,16 @@ private void fill_tab3(){
         name_txt.setFont(myFont);
         gen_form.add(name_txt);
 
-        JTextField name = new JTextField();
-        name.setBounds(120, 98, 150, 30);
-        gen_form.add(name);
+        username = new JTextField();
+        username.setBounds(120, 98, 150, 30);
+        gen_form.add(username);
 
         JLabel mail_text = new JLabel("E-mail: ");
         mail_text.setBounds(20, 150, 70, 20);
         mail_text.setFont(myFont);
         gen_form.add(mail_text);
 
-        JTextField mail = new JTextField();
+        mail = new JTextField();
         mail.setBounds(120, 148, 150, 30);
         gen_form.add(mail);
 
@@ -383,7 +397,7 @@ private void fill_tab3(){
         pass_text.setFont(myFont);
         gen_form.add(pass_text);
 
-        JPasswordField pass_field = new JPasswordField();
+        pass_field = new JPasswordField();
         pass_field.setBounds(120, 198, 150, 30);
         gen_form.add(pass_field);
 
@@ -393,16 +407,16 @@ private void fill_tab3(){
         gen_form.add(dsa_choose_txt);
 
         String[] dsa_choice_opt = {"1024", "2048", "4096"};
-        JComboBox dsa_choice = new JComboBox<>(dsa_choice_opt);
+        dsa_choice = new JComboBox<>(dsa_choice_opt);
         dsa_choice.setBounds(140, 248, 100, 30);
         gen_form.add(dsa_choice);
 
         gen_form.setPreferredSize(new Dimension(300, 500));
         gen_panel.add(gen_form, BorderLayout.CENTER);
 
-        JButton generate = new JButton("Generate");
-        generate.setPreferredSize(new Dimension(100,40));
-        gen_panel.add(generate, BorderLayout.SOUTH);
+        generate_dsa = new JButton("Generate");
+        generate_dsa.setPreferredSize(new Dimension(100,40));
+        gen_panel.add(generate_dsa, BorderLayout.SOUTH);
         adition.add(gen_panel, BorderLayout.WEST);
     }
 
@@ -414,7 +428,7 @@ private void fill_tab3(){
         priv_key.setBounds(100, 10, 150, 25);
         show_panel.add(priv_key);
 
-        JList<String> lista4 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+        lista4 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
         private_key_pool1 = new JScrollPane(lista4);
         private_key_pool1.setBounds(100, 40, 300, 330);
         show_panel.add(private_key_pool1);
@@ -424,9 +438,11 @@ private void fill_tab3(){
         publ_key.setBounds(530, 10, 150, 25);
         show_panel.add(publ_key);
 
-        JList<String> lista3 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+        lista3 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
+        lista3.add(new JLabel("EWFwef"));
         public_key_pool1 = new JScrollPane(lista3);
-        public_key_pool1.setEnabled(false);
+        //public_key_pool1.getViewport().getView().add
+//        public_key_pool1.setEnabled(false);
         public_key_pool1.setBounds(530, 40, 300, 330);
         show_panel.add(public_key_pool1);
     }
@@ -502,6 +518,16 @@ private void fill_tab3(){
 }
 
 private void add_action_listeners() {
+
+    generate_dsa.addActionListener( e -> {
+
+        try {
+            KeyRings.generateNewUserKeyPair("DSA",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
+        } catch (PGPException ex) {
+            throw new RuntimeException(ex);
+        }
+
+    });
 
     opt_encryption_check.addActionListener(e -> {
         if(!opt_encryption_check.isSelected()){

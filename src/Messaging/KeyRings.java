@@ -1,5 +1,6 @@
 package Messaging;
 
+import App.View_User;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
@@ -15,6 +16,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import javax.crypto.spec.DHParameterSpec;
+import javax.swing.*;
 import java.security.*;
 import java.util.Collections;
 
@@ -107,7 +109,8 @@ public class KeyRings {
 
             PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
 
-            if (privateKeyRingCollection.getKeyRings(username).next() == null) {
+            if (!privateKeyRingCollection.getKeyRings(username).hasNext() ) {
+
                 PGPKeyRingGenerator keyRingGen = new PGPKeyRingGenerator(
                         PGPSignature.POSITIVE_CERTIFICATION,
                         kp,
@@ -122,9 +125,12 @@ public class KeyRings {
 
                 PGPSecretKeyRing skr = keyRingGen.generateSecretKeyRing();
 
-                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
+                publicKeyRing = PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
                 PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRingCollection,skr);
 
+                View_User.lista3.add(new JLabel("[(DSA) " + username + ": " + kp.toString() + " ]"));
+                //View_User.lista3.set(new JLabel("[(DSA) " + username + ": " + kp.toString() + " ]"));
+                View_User.lista3.setVisible(true);
             }
         }
         else if (algo.equals("ElGamal")) {
