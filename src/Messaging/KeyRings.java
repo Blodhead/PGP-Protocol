@@ -125,12 +125,15 @@ public class KeyRings {
 
                 PGPSecretKeyRing skr = keyRingGen.generateSecretKeyRing();
 
-                publicKeyRing = PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
+                publicKeyRing = PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());//DRUGI PUT KAD SE GENERISE KLJUC ISKACE ERROR
                 PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRingCollection,skr);
 
-                View_User.lista3.add(new JLabel("[(DSA) " + username + ": " + kp.toString() + " ]"));
-                //View_User.lista3.set(new JLabel("[(DSA) " + username + ": " + kp.toString() + " ]"));
-                View_User.lista3.setVisible(true);
+                View_User.private_list.add("[(DSA) " + username + ": " + kp.getPrivateKey().toString().getBytes() + " ]");
+                View_User.addToList(View_User.private_Jlist,View_User.private_list);
+
+                View_User.public_list.add("[(DSA) " + username + ": " + kp.getPublicKey().toString().getBytes() + " ]");
+                View_User.addToList(View_User.public_JList,View_User.public_list);
+
             }
         }
         else if (algo.equals("ElGamal")) {

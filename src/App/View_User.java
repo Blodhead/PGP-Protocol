@@ -3,7 +3,6 @@ package App;
 import Messaging.KeyRings;
 import org.bouncycastle.openpgp.PGPException;
 
-import javax.crypto.KeyGenerator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -24,6 +24,8 @@ import javax.swing.filechooser.FileSystemView;
 
 public class View_User extends JFrame {
 
+    private static View_User u1;
+
     private final JPanel p1 = new JPanel();
     private final JPanel p2 = new JPanel();
     private final JPanel p3 = new JPanel();
@@ -32,11 +34,16 @@ public class View_User extends JFrame {
     private JCheckBox opt_authentication_check;
     private JComboBox<String> encryption_algorithm;
     private JScrollPane private_key_pool;
+
+    DefaultListModel<String> string_model = new DefaultListModel<>();
+
     public static JScrollPane private_key_pool1;
     public static JScrollPane public_key_pool1;
 
-    public static JList<String> lista4;
-    public static JList<String> lista3;
+    public static JList<String> private_Jlist;
+    public static ArrayList<String> private_list;
+    public static ArrayList<String> public_list;
+    public static JList<String> public_JList;
 
     private JScrollPane public_key_pool;
     private JButton exp_button;
@@ -71,7 +78,7 @@ private View_User() {
             }
         });
 
-        fill_space();
+    fill_space();
         setBounds(300, 150, 1300, 800);
 
         fill_tab1();
@@ -423,28 +430,37 @@ private void fill_tab3(){
     //////////////////////TABLES///////////////////////////
 
     {
+        ///LISTA PRIVATNIH KLJUCEVA
         JLabel priv_key = new JLabel("Private key ring:");
         priv_key.setFont(myFont);
         priv_key.setBounds(100, 10, 150, 25);
         show_panel.add(priv_key);
 
-        lista4 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
-        private_key_pool1 = new JScrollPane(lista4);
+        private_list = new ArrayList<>();
+        private_Jlist = new JList<>(private_list.toArray(new String[0]));
+        private_Jlist.setSelectedIndex(0);
+        private_Jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        private_key_pool1 = new JScrollPane(private_Jlist);
         private_key_pool1.setBounds(100, 40, 300, 330);
         show_panel.add(private_key_pool1);
 
+        ///LISTA JAVNIH KLJUCEVA
         JLabel publ_key = new JLabel("Public key ring:");
         publ_key.setFont(myFont);
         publ_key.setBounds(530, 10, 150, 25);
         show_panel.add(publ_key);
 
-        lista3 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
-        lista3.add(new JLabel("EWFwef"));
-        public_key_pool1 = new JScrollPane(lista3);
-        //public_key_pool1.getViewport().getView().add
-//        public_key_pool1.setEnabled(false);
+
+        public_list = new ArrayList<>();
+        public_JList = new JList<>(public_list.toArray(new String[0]));
+        public_JList.setSelectedIndex(0);
+        public_JList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        public_key_pool1 =new JScrollPane(public_JList);
         public_key_pool1.setBounds(530, 40, 300, 330);
         show_panel.add(public_key_pool1);
+
     }
 
     /////////////////////Miscellaneous///////////////////////////
@@ -608,8 +624,14 @@ private void add_action_listeners() {
 
 }
 
+public static void addToList(JList<String> _list, ArrayList<String> _str){
+    _list.setListData(_str.toArray(new String[0]));
+}
 
-    public static void getUser_view() {//bice pozvana samo jednom
-        new View_User();
+public static View_User getUser_view() {//bice pozvana samo jednom
+        if(u1 == null)
+            u1 = new View_User();
+
+        return u1;
     }
 }
