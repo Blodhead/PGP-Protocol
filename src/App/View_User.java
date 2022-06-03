@@ -18,6 +18,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileSystemView;
 
 //import static javax.swing.JOptionPane.showMessageDialog; needed for messages alert
@@ -621,7 +623,12 @@ private void add_action_listeners() {
         }
     });
 
+    private_Jlist.addListSelectionListener(new ListSelectionListener() {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
 
+        }
+    });
 }
 
 public static void addToList(JList<String> _list, ArrayList<String> _str){
