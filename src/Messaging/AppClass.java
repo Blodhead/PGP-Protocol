@@ -6,8 +6,8 @@ import App.*;
 //import Zipping.*;
 public class AppClass {
 
-    User ksenija = new User();
-    User milos = new User();
+    //User ksenija = new User();
+    //User milos = new User();
 
 
 

@@ -58,6 +58,8 @@ public class View_User extends JFrame {
     private JComboBox dsa_choice;
     private JButton generate_dsa;
 
+    public JList<String> selected_list;
+
 private View_User() {
         super("Pretty Good Privacy protocol");
 
@@ -79,7 +81,7 @@ private View_User() {
                 dispose();
             }
         });
-
+    selected_list = null;
     fill_space();
         setBounds(300, 150, 1300, 800);
 
@@ -626,7 +628,20 @@ private void add_action_listeners() {
     private_Jlist.addListSelectionListener(new ListSelectionListener() {
         @Override
         public void valueChanged(ListSelectionEvent e) {
+            if(selected_list == public_JList){
+                public_JList.clearSelection();
+                selected_list = private_Jlist;
+            }else selected_list = private_Jlist;
 
+        }
+    });
+    public_JList.addListSelectionListener(new ListSelectionListener() {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if(selected_list == private_Jlist){
+                private_Jlist.clearSelection();
+                selected_list = public_JList;
+            }else selected_list = public_JList;
         }
     });
 }
