@@ -15,6 +15,10 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.DHParameterSpec;
 import javax.swing.*;
 import java.security.*;
@@ -77,25 +81,42 @@ public class KeyRings {
                 // podesavanje parametara za ElGamal
                 // videti kako se biraju parametri
 
-                BigInteger bi1 = BigInteger.probablePrime(16, new Random());
-                BigInteger bi2 = BigInteger.probablePrime(16, new Random());
+                byte[] input = "ab".getBytes();
+                Cipher cipher = Cipher.getInstance("ElGamal/None/NoPadding", "BC");
+                KeyPairGenerator generator = KeyPairGenerator.getInstance("ElGamal", "BC");
+                SecureRandom random = new SecureRandom();
 
-                DHParameterSpec dhParam = new DHParameterSpec(bi1, bi2);
+                generator.initialize(size, random);
 
-                EGkpg.initialize(dhParam);
-                kp = EGkpg.generateKeyPair();
+                kp = generator.generateKeyPair();
+                Key pubKey = kp.getPublic();
+                Key privKey = kp.getPrivate();
+//                cipher.init(Cipher.ENCRYPT_MODE, pubKey, random);
+//                byte[] cipherText = cipher.doFinal(input);
+//                System.out.println("cipher: " + new String(cipherText));
+//
+//                cipher.init(Cipher.DECRYPT_MODE, privKey);
+//                byte[] plainText = cipher.doFinal(cipherText);
+//                System.out.println("plain : " + new String(plainText));
+
+
+//                BigInteger bi1 = BigInteger.probablePrime(16, new Random());
+//                BigInteger bi2 = BigInteger.probablePrime(16, new Random());
+//
+//                DHParameterSpec dhParam = new DHParameterSpec(bi1, bi2);
+//
+//                EGkpg.initialize(dhParam);
+//                kp = EGkpg.generateKeyPair();
 
                 return new JcaPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, kp, new Date());
 
             }
-            else {
-                return null;
-            }
+
 
 //            PublicKey pub = kp.getPublic();
             //PGPPublicKeyRing pubKR = publicKeyRing;
 
-        } catch (InvalidAlgorithmParameterException | PGPException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -140,29 +161,33 @@ public class KeyRings {
 
             }
         }
-//        else if (algo.equals("ElGamal")) {
-//
-//            try {
-//
-//
-//
-//
-//                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
-//
-//                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
-//
-//                PGPKeyRingGenerator krg = generatorHashMap.get(username);
-//
+        else if (algo.equals("ElGamal")) {
+
+            try {
+
+
+
+
+                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
+
+                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
+
+                PGPKeyRingGenerator krg = generatorHashMap.get(username);
+
 //                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
-//                krg.addSubKey(kp);
-//
-//            }
-//            catch (NoSuchElementException e) {
-//                return "NoSuchElementException";
-//            }
-//
-//
-//        }
+                krg.addSubKey(kp);
+
+                User user = User.getUser(username);
+                user.addPrivateKey(algo, krg.generateSecretKeyRing().getSecretKey());
+                user.addPublicKey(algo, krg.generatePublicKeyRing().getPublicKey());
+
+            }
+            catch (NoSuchElementException e) {
+                return "NoSuchElementException";
+            }
+
+
+        }
 
         return null;
 
