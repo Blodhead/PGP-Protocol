@@ -36,8 +36,9 @@ public class User {
         privateKeyList.add(new PrivateKeyElem(algo, username, pkr));
     }
 
-    public ArrayList<PrivateKeyElem> getUserPrivateKeys() {
-        return privateKeyList;
+    public static ArrayList<PrivateKeyElem> getUserPrivateKeys(String username) {
+        User user = userMap.get(username);
+        return user.privateKeyList;
     }
 
     public static ArrayList<PublicKeyElem> getPublicKeys() {
@@ -53,7 +54,7 @@ public class User {
     }
 
     public static PrivateKeyElem getSecretKey(String username, long ID) {
-        for (PrivateKeyElem elem: userMap.get(username).getUserPrivateKeys())
+        for (PrivateKeyElem elem: getUserPrivateKeys(username))
             if (elem.getKeyId() == ID)
                 return elem;
 

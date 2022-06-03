@@ -42,8 +42,8 @@
 //     */
 //    public static void signEncryptFile(
 //            String fileName,
-//            PGPPublicKeyRing publicKey,
-//            PGPSecretKeyRing secretKey,
+//            PGPPublicKey publicKey,
+//            PGPSecretKey secretKey,
 //            char[] password,
 //            boolean encrypt,
 //            boolean sign,
@@ -80,18 +80,14 @@
 //
 //            encryptedDataGenerator = new PGPEncryptedDataGenerator(dataEncryptor);
 //
-//            PGPPublicKey next = null;
-//
-//            for (Iterator<PGPPublicKey> iterator = publicKey.getPublicKeys(); iterator.hasNext();) {
-//                next = iterator.next();
-//                if (next.isEncryptionKey())
-//                    break;
+//            if (!publicKey.isEncryptionKey()) {
+//                // error
+//                return;
 //            }
 //
-//            if (next != null) {
-//                encryptedDataGenerator.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(next));
-//                encryptedOut = encryptedDataGenerator.open(out, new byte[PGPUtility.BUFFER_SIZE]);
-//            }
+//            encryptedDataGenerator.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(publicKey));
+//            encryptedOut = encryptedDataGenerator.open(out, new byte[PGPUtility.BUFFER_SIZE]);
+//
 //        }
 //
 //        // COMPRESS
@@ -104,14 +100,12 @@
 //
 //        if (sign) {
 //
-//            PGPSecretKey next;
-//            for (Iterator<PGPSecretKey> iterator = secretKey.getSecretKeys(); iterator.hasNext();) {
-//                next = iterator.next();
-//                if (next.isSigningKey())
-//                    break;
+//            if (!secretKey.isSigningKey()) {
+//                // error
+//                return;
 //            }
 //
-//            PGPPrivateKey privateKey = findPrivateKey(secretKey.getSecretKey(), password);
+//            PGPPrivateKey privateKey = findPrivateKey(secretKey, password);
 //            PGPContentSignerBuilder signerBuilder = new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(),
 //                    HashAlgorithmTags.SHA1);
 //            signatureGenerator = new PGPSignatureGenerator(signerBuilder);
