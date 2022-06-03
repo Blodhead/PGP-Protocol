@@ -23,6 +23,7 @@ import java.util.Collections;
 
 public class KeyRings {
 
+    // KR Collection je zapravo obican KeyRing (kako mi koristimo)
     private static PGPSecretKeyRingCollection privateKeyRingCollection;
     private static PGPPublicKeyRingCollection publicKeyRingCollection;
 
@@ -60,7 +61,7 @@ public class KeyRings {
         }
     }
 
-    public static PGPKeyPair generateNewKeyPair(String algo, int size, String password){
+    private static PGPKeyPair generateNewKeyPair(String algo, int size, String password){
         try {
 
             KeyPair kp;
@@ -109,7 +110,7 @@ public class KeyRings {
 
             PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
 
-            if (!privateKeyRingCollection.getKeyRings(username).hasNext() ) {
+            if (!privateKeyRingCollection.getKeyRings(username).hasNext() ) { // dohvata userov generator
 
                 PGPKeyRingGenerator keyRingGen = new PGPKeyRingGenerator(
                         PGPSignature.POSITIVE_CERTIFICATION,
@@ -124,37 +125,44 @@ public class KeyRings {
                 generatorHashMap.put(username, keyRingGen);
 
                 PGPSecretKeyRing skr = keyRingGen.generateSecretKeyRing();
+//                skr = PGP.insertSecretKey(skr, keyRingGen.)
+                privateKeyRingCollection = PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRingCollection,skr);
 
-                publicKeyRing = PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());//DRUGI PUT KAD SE GENERISE KLJUC ISKACE ERROR
-                PGPSecretKeyRingCollection.addSecretKeyRing(privateKeyRingCollection,skr);
+                // jedinstveni public Key Ring za sve usere
+                PGPPublicKeyRing pkr = keyRingGen.generatePublicKeyRing();
+//                pkr = PGPPublicKeyRing.insertPublicKey(pkr, kp.getPublicKey());
+                publicKeyRingCollection = PGPPublicKeyRingCollection.addPublicKeyRing(publicKeyRingCollection, pkr);//DRUGI PUT KAD SE GENERISE KLJUC ISKACE ERROR
 
-                View_User.private_list.add("[(DSA) " + username + ": " + kp.getPrivateKey().toString().getBytes() + " ]");
-                View_User.addToList(View_User.private_Jlist,View_User.private_list);
 
-                View_User.public_list.add("[(DSA) " + username + ": " + kp.getPublicKey().toString().getBytes() + " ]");
-                View_User.addToList(View_User.public_JList,View_User.public_list);
+                User user = User.getUser(username);
+                user.addPrivateKey(algo, skr.getSecretKey());
+                user.addPublicKey(algo, pkr.getPublicKey());
 
             }
         }
-        else if (algo.equals("ElGamal")) {
-
-            try {
-                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
-
-                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
-
-                PGPKeyRingGenerator krg = generatorHashMap.get(username);
-
-                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
-                krg.addSubKey(kp);
-
-            }
-            catch (NoSuchElementException e) {
-                return "NoSuchElementException";
-            }
-
-
-        }
+//        else if (algo.equals("ElGamal")) {
+//
+//            try {
+//
+//
+//
+//
+//                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
+//
+//                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
+//
+//                PGPKeyRingGenerator krg = generatorHashMap.get(username);
+//
+//                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
+//                krg.addSubKey(kp);
+//
+//            }
+//            catch (NoSuchElementException e) {
+//                return "NoSuchElementException";
+//            }
+//
+//
+//        }
 
         return null;
 
