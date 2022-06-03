@@ -6,6 +6,7 @@ import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
 
 public class User {
 
@@ -41,8 +42,26 @@ public class User {
         return user.privateKeyList;
     }
 
+    public static Vector<String> getUserPrivateKeysString(String username) {
+        User user = userMap.get(username);
+
+        Vector<String> str = new Vector<String>();
+        for(PrivateKeyElem elem: user.privateKeyList)
+            str.add(elem.toString());
+
+        return str;
+    }
+
     public static ArrayList<PublicKeyElem> getPublicKeys() {
         return publicKeyList;
+    }
+
+    public static ArrayList<String> getPublicKeysString() {
+        ArrayList<String> str = new ArrayList<String>();
+        for(PublicKeyElem elem: publicKeyList)
+            str.add(elem.toString());
+
+        return str;
     }
 
     public static PublicKeyElem getPublicKey(String username, long ID) {
