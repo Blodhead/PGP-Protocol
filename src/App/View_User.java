@@ -1,6 +1,9 @@
 package App;
 
 import Messaging.KeyRings;
+import Messaging.PrivateKeyElem;
+import Messaging.PublicKeyElem;
+import Messaging.User;
 import org.bouncycastle.openpgp.PGPException;
 
 import javax.swing.*;
@@ -36,8 +39,6 @@ public class View_User extends JFrame {
     private JCheckBox opt_authentication_check;
     private JComboBox<String> encryption_algorithm;
     private JScrollPane private_key_pool;
-
-    DefaultListModel<String> string_model = new DefaultListModel<>();
 
     public static JScrollPane private_key_pool1;
     public static JScrollPane public_key_pool1;
@@ -543,6 +544,11 @@ private void add_action_listeners() {
 
         try {
             KeyRings.generateNewUserKeyPair("DSA",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
+            ArrayList<PublicKeyElem> public_list = User.getPublicKeys();
+            ArrayList<PrivateKeyElem> d = User.getSecretKeys(username);
+
+
+
         } catch (PGPException ex) {
             throw new RuntimeException(ex);
         }
