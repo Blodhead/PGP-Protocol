@@ -135,37 +135,34 @@ public class KeyRings {
 
 
                 User user = User.getUser(username);
-                user.addPrivateKey(skr.getSecretKey());
-                user.addPublicKey(pkr.getPublicKey());
+                user.addPrivateKey(algo, skr.getSecretKey());
+                user.addPublicKey(algo, pkr.getPublicKey());
 
-
-//                View_User.private_list.add("[(DSA) " + username + ": " + kp.getPrivateKey().toString().getBytes() + " ]");
-//                View_User.addToList(View_User.private_Jlist,View_User.private_list);
+            }
+        }
+//        else if (algo.equals("ElGamal")) {
 //
-//                View_User.public_list.add("[(DSA) " + username + ": " + kp.getPublicKey().toString().getBytes() + " ]");
-//                View_User.addToList(View_User.public_JList,View_User.public_list);
-
-            }
-        }
-        else if (algo.equals("ElGamal")) {
-
-            try {
-                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
-
-                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
-
-                PGPKeyRingGenerator krg = generatorHashMap.get(username);
-
-                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
-                krg.addSubKey(kp);
-
-            }
-            catch (NoSuchElementException e) {
-                return "NoSuchElementException";
-            }
-
-
-        }
+//            try {
+//
+//
+//
+//
+//                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
+//
+//                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
+//
+//                PGPKeyRingGenerator krg = generatorHashMap.get(username);
+//
+//                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
+//                krg.addSubKey(kp);
+//
+//            }
+//            catch (NoSuchElementException e) {
+//                return "NoSuchElementException";
+//            }
+//
+//
+//        }
 
         return null;
 
