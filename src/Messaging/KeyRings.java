@@ -12,15 +12,8 @@ import org.bouncycastle.openpgp.operator.jcajce.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.*;
-
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.DHParameterSpec;
-import javax.swing.*;
 import java.security.*;
 import java.util.Collections;
 
