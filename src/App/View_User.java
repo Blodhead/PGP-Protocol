@@ -2,28 +2,28 @@
         package App;
 
         import Messaging.KeyRings;
+        import Messaging.PrivateKeyElem;
+        import Messaging.PublicKeyElem;
         import Messaging.User;
-        import org.bouncycastle.openpgp.PGPException;
+        import org.bouncycastle.openpgp.*;
+        import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 
         import javax.swing.*;
-        import java.awt.*;
-        import java.awt.event.ActionEvent;
-        import java.awt.event.ActionListener;
-        import java.awt.event.WindowAdapter;
-        import java.awt.event.WindowEvent;
-
-        import java.awt.BorderLayout;
-        import java.util.ArrayList;
-        import java.util.Vector;
-        import javax.swing.JFrame;
-        import javax.swing.JPanel;
-        import javax.swing.JTabbedPane;
-        import javax.swing.UIManager.*;
+        import javax.swing.UIManager.LookAndFeelInfo;
         import javax.swing.border.EmptyBorder;
         import javax.swing.border.TitledBorder;
-        import javax.swing.event.ListSelectionEvent;
-        import javax.swing.event.ListSelectionListener;
+        import javax.swing.filechooser.FileNameExtensionFilter;
         import javax.swing.filechooser.FileSystemView;
+        import java.awt.*;
+        import java.awt.event.WindowAdapter;
+        import java.awt.event.WindowEvent;
+        import java.io.File;
+        import java.io.FileNotFoundException;
+        import java.io.FileOutputStream;
+        import java.security.KeyPair;
+        import java.security.KeyStore;
+        import java.util.Base64;
+        import java.util.Vector;
 
 //import static javax.swing.JOptionPane.showMessageDialog; needed for messages alert
 
@@ -39,8 +39,6 @@ public class View_User extends JFrame {
     private JCheckBox opt_authentication_check;
     private JComboBox<String> encryption_algorithm;
     private JScrollPane private_key_pool;
-
-    DefaultListModel<String> string_model = new DefaultListModel<>();
 
     public static JScrollPane private_key_pool1;
     public static JScrollPane public_key_pool1;
@@ -61,7 +59,6 @@ public class View_User extends JFrame {
     private JComboBox dsa_choice;
     private JComboBox elGamal_choice;
     private JButton generate_dsa;
-    private ButtonGroup button_group;
     private JCheckBox dsa_button;
     private JCheckBox elGamal_button;
 
@@ -189,7 +186,7 @@ public class View_User extends JFrame {
                 opt_encryption_body.add(wrap, BorderLayout.NORTH);
 
                 JPanel temp2 = new JPanel(new BorderLayout());
-                JLabel choose_enc_key = new JLabel("Choose public DSA key: ");
+                JLabel choose_enc_key = new JLabel("Choose public ElGamal key: ");
                 choose_enc_key.setFont(new Font("Texas", Font.ITALIC, 17));
                 temp2.add(choose_enc_key, BorderLayout.NORTH);
 
@@ -348,7 +345,7 @@ public class View_User extends JFrame {
         ciphertext.setBounds(400,30,500,30);
         JTextField plaintext = new JTextField();
         plaintext.setBounds(400,110,500,30);
-        ;
+
 
         JButton decrypt = new JButton("Receive");
         decrypt.setBounds(560,70,100,30);
@@ -436,7 +433,7 @@ public class View_User extends JFrame {
             gen_form.add(elGamal_button);
 
 
-            button_group = new ButtonGroup();
+            ButtonGroup button_group = new ButtonGroup();
 
             button_group.add(dsa_button);
             button_group.add(elGamal_button);
@@ -620,107 +617,111 @@ public class View_User extends JFrame {
             }
         });
 
-        exp_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
+        exp_button.addActionListener(ae -> {
+            JFileChooser chooser;
 
-                JFileChooser chooser = new JFileChooser();
+            if(selected_list != null)
+            chooser = new JFileChooser();
+            else return;
 
-                int returnVal = chooser.showOpenDialog(null);
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
+            chooser.setFileFilter(filter);
 
-                if (returnVal != JFileChooser.APPROVE_OPTION)
-                    return;
+            int returnVal = 0;
 
-                try {
-                 /*if (Main.publicKeys.size() <= 0)
-                     return;*/
-                 /*PPGPPrstenJavnihKljuceva k = (PPGPPrstenJavnihKljuceva) Main.publicKeys
-                         .get(exportJCh.getSelectedIndex());
-                 saveKey(k.getPublicKeyRing().getEncoded());
-                 poruka.setText("");*/
-                } catch (Exception ex) {
-                 /*poruka.setText("ERROR: Javni kljuc nije eksportovan.");
-                 ex.printStackTrace();*/
-                }
-
+            if(selected_list == public_JList) {
+                chooser.setDialogTitle("Export file");
+                returnVal = chooser.showSaveDialog(null);
+            } else if (selected_list == private_Jlist) {
+                chooser.setDialogTitle("Import file");
+                returnVal = chooser.showSaveDialog(null);
             }
-        });
 
-        imp_key_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                JFileChooser chooser = new JFileChooser();
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                File fileToSave = chooser.getSelectedFile();
+                if(selected_list == public_JList){
+                   String s = public_JList.getSelectedValue();
+                    String strArray[] = s.split(" ");
+                    PublicKeyElem pub = User.getPublicKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
+                    try {
+                        //KeyStore keyStore = new KeyStore("pgp.keystore", "BC");
+                        /*PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(pub.getAlgorithm(), PGPUtil.SHA1, "BC");
+                        PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
+                        signatureGenerator.generateOnePassVersion(false).encode(compressedOut);*/
+                        //PGPKeyPair        elgKeyPair = new JcaPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
+                        //Base64.getEncoder().encode();
 
-                int returnVal = chooser.showOpenDialog(null);
+                        FileOutputStream public_out = new FileOutputStream(fileToSave.getName()+".asc");
 
-                if (returnVal != JFileChooser.APPROVE_OPTION)
-                    return;
+                        //savefile
 
-                try {
-                 /*if (chckbxNewCheckBox.isSelected()) {
-                     PGPSecretKeyRing ring = PrstenKljuceva
-                             .importPrivateKey(new FileInputStream(chooser.getSelectedFile()));
-                     System.out.println("privatni");
-                 } else {
-                     PGPPublicKeyRing ring = PrstenKljuceva
-                             .importPublicKey(new FileInputStream(chooser.getSelectedFile()));
-                     System.out.println("javni");
-                 }*/
-                    //poruka.setText("");
-                } catch (Exception ex) {
-                    // ex.printStackTrace();
-                    //poruka.setText("ERROR: Import nije uspeo.");
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+
                 }
-
-                //updatePrivKeysList();
-                //updatePubKeysList();
-
-            }
-        });
-
-        private_Jlist.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                            if(selected_list == public_JList){
-                                    public_JList.clearSelection();
-                                    selected_list = private_Jlist;
-                                }else selected_list = private_Jlist;
-
-            }
-        });
-            public_JList.addListSelectionListener(new ListSelectionListener() {
-       @Override
-        public void valueChanged(ListSelectionEvent e) {
-                            if(selected_list == private_Jlist){
-                                private_Jlist.clearSelection();
-                                selected_list = public_JList;
-                            }else selected_list = public_JList;
-                        }
-    });
-
-            dsa_button.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    dsa_choice.setEnabled(true);
-                    elGamal_choice.setEnabled(false);
+                else if(selected_list == private_Jlist){
+                    String s = private_Jlist.getSelectedValue();
                 }
+            }
+
+/*
+        PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
+        PGPKeyPair          keyPair = new JcaPGPKeyPair(PGPPublicKey.RSA_GENERAL, pair, new Date());
+        PGPSecretKey        secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, keyPair, identity, sha1Calc, null, null, new JcaPGPContentSignerBuilder(keyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA256), new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).setProvider("BC").build(passPhrase));
+        */
+
             });
-            elGamal_button.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    elGamal_choice.setEnabled(true);
-                    dsa_choice.setEnabled(false);
-                }
-            });
+
+        imp_key_button.addActionListener(ae -> {
+            JFileChooser chooser = new JFileChooser();
+            File fileToSave = chooser.getSelectedFile();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
+            chooser.setFileFilter(filter);
+
+            int returnVal = chooser.showOpenDialog(null);
+
+            if (returnVal != JFileChooser.APPROVE_OPTION)
+                return;
+
+            try {
+
+            } catch (Exception ex) {
+
+            }
+
+        });
+
+        private_Jlist.addListSelectionListener(e -> {
+            if(selected_list == public_JList){
+                    public_JList.clearSelection();
+            }
+            selected_list = private_Jlist;
+
+        });
+        public_JList.addListSelectionListener(e -> {
+             if(selected_list == private_Jlist){
+                 private_Jlist.clearSelection();
+             }
+            selected_list = public_JList;
+        });
+
+        dsa_button.addActionListener(e -> {
+            dsa_choice.setEnabled(true);
+            elGamal_choice.setEnabled(false);
+        });
+        elGamal_button.addActionListener(e -> {
+            elGamal_choice.setEnabled(true);
+            dsa_choice.setEnabled(false);
+        });
+
+
 
     }
 
-    public static void addToList(JList<String> _list, ArrayList<String> _str){
-        _list.setListData(_str.toArray(new String[0]));
-    }
-
-    public static View_User getUser_view() {//bice pozvana samo jednom
+    public static void getUser_view() {//bice pozvana samo jednom
         if(u1 == null)
             u1 = new View_User();
 
-        return u1;
     }
 }
