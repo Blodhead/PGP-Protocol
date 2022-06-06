@@ -5,6 +5,7 @@ import Messaging.KeyRings;
 import Messaging.PrivateKeyElem;
 import Messaging.PublicKeyElem;
 import Messaging.User;
+import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.openpgp.*;
 
 import javax.swing.*;
@@ -19,6 +20,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -575,11 +577,9 @@ public class View_User extends JFrame {
             try {
                 String str_dsa,str_el;
                 if(dsa_button.isSelected())
-                    str_dsa = KeyRings.generateNewUserKeyPair("DSA",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
+                    str_dsa = KeyRings.generateNewUserKeyPair("DSA",username.getText(), String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
                 else
-                    str_el = KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
-
-
+                    str_el = KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
 
                 View_User.private_list.removeAll(private_list);
                 View_User.private_list.addAll(User.getSecretKeys(username.getText()));
@@ -626,7 +626,7 @@ public class View_User extends JFrame {
             chooser = new JFileChooser();
             else return;
 
-            if((selected_list.getSelectedValue().toCharArray())[0] != '#'){
+            if((selected_list.getSelectedValue().toCharArray())[0] == '#'){
                 if(selected_list == public_JList)
                 JOptionPane.showMessageDialog(error_msg,
                         "Choose a valid user to export his public keys!",
@@ -646,38 +646,35 @@ public class View_User extends JFrame {
 
             int returnVal = 0;
 
-            chooser.setDialogTitle("Export file");
+            if(selected_list == public_JList)
+                chooser.setDialogTitle("Export public key ring:");
+            else if(selected_list == private_Jlist)
+                chooser.setDialogTitle("Export private key ring:");
+
             returnVal = chooser.showSaveDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION){
-                File fileToSave = chooser.getSelectedFile();
+                //File fileToSave = chooser.getSelectedFile();
                 ////////////////////PUBLIC KEY
                 if(selected_list == public_JList){
-                   String s = public_JList.getSelectedValue();
-                    String strArray[] = s.split(" ");
-                    //PublicKeyElem pub = User.getPublicKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
-                    try {
-
-
-                        FileOutputStream public_out = new FileOutputStream(fileToSave.getName()+".asc");
-
-                        //savefile
-
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                    PGPPublicKeyRing pkr = User.getPublicKeyRing(selected_list.getSelectedValue());
+                    //File f = new File(chooser.getSelectedFile().getAbsolutePath());
+                    try (ArmoredOutputStream out = new ArmoredOutputStream(new FileOutputStream(chooser.getSelectedFile() + "-public.asc"))) {
+                        pkr.encode(out);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                 }
                 //////////////////////PRIVATE KEY
                 else if(selected_list == private_Jlist){
-                    String s = private_Jlist.getSelectedValue();
-                    String strArray[] = s.split(" ");
-                    //PrivateKeyElem pub = User.getSecretKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
 
-                    try {
-                        FileOutputStream public_out = new FileOutputStream(fileToSave.getName()+".asc");
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                    PGPSecretKeyRing pkr = User.getSecretKeyRing(selected_list.getSelectedValue());
+
+                    try (ArmoredOutputStream out = new ArmoredOutputStream(new FileOutputStream(chooser.getSelectedFile()  + "-private.asc"))) {
+                        pkr.encode(out);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                 }
