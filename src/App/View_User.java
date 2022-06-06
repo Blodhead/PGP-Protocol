@@ -2,11 +2,10 @@
 package App;
 
 import Messaging.KeyRings;
-import Messaging.PrivateKeyElem;
-import Messaging.PublicKeyElem;
 import Messaging.User;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.openpgp.*;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -18,9 +17,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -570,7 +568,7 @@ public class View_User extends JFrame {
 
     }
 
-    private void add_action_listeners() {
+    private void add_action_listeners(){
 
         generate_dsa.addActionListener( e -> {
 
@@ -591,7 +589,7 @@ public class View_User extends JFrame {
                 public_JList.setListData(public_list);
 
 
-            } catch (PGPException ex) {
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
 
@@ -643,7 +641,7 @@ public class View_User extends JFrame {
             FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
             chooser.setFileFilter(filter);
 
-            int returnVal = 0;
+            int returnVal;
 
             if(selected_list == public_JList)
                 chooser.setDialogTitle("Export public key ring:");
@@ -656,7 +654,7 @@ public class View_User extends JFrame {
                 ////////////////////PUBLIC KEY
                 if(selected_list == public_JList){
                     PGPPublicKeyRing pkr = User.getPublicKeyRing(selected_list.getSelectedValue());
-                    try (ArmoredOutputStream out = new ArmoredOutputStream(new FileOutputStream(chooser.getSelectedFile() + "-public.asc"))) {
+                    try (ArmoredOutputStream out = new ArmoredOutputStream(Files.newOutputStream(Paths.get(chooser.getSelectedFile() + "-public.asc")))) {
                         pkr.encode(out);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -668,7 +666,7 @@ public class View_User extends JFrame {
 
                     PGPSecretKeyRing pkr = User.getSecretKeyRing(selected_list.getSelectedValue());
 
-                    try (ArmoredOutputStream out = new ArmoredOutputStream(new FileOutputStream(chooser.getSelectedFile()  + "-private.asc"))) {
+                    try (ArmoredOutputStream out = new ArmoredOutputStream(Files.newOutputStream(Paths.get(chooser.getSelectedFile() + "-private.asc")))) {
                         pkr.encode(out);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -691,10 +689,10 @@ public class View_User extends JFrame {
                 returnVal = chooser.showOpenDialog(null);
                 if (returnVal == JFileChooser.APPROVE_OPTION){
                     fileToLoad = chooser.getSelectedFile();
-                    if(fileToLoad.getName().contains("private.asc") == true){
+                    if(fileToLoad.getName().contains("private.asc")){
                         ///
                         good_choice = true;
-                    }else if(fileToLoad.getName().contains("public.asc") == true) {
+                    }else if(fileToLoad.getName().contains("public.asc")) {
                         ///
                         good_choice = true;
                     }else{
