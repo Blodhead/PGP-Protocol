@@ -19,6 +19,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -28,6 +29,7 @@ public class View_User extends JFrame {
     private final JPanel p1 = new JPanel();
     private final JPanel p2 = new JPanel();
     private final JPanel p3 = new JPanel();
+    private final JPanel p4 = new JPanel();
     private JCheckBox opt_encryption_check;
 
     private JCheckBox opt_authentication_check;
@@ -57,6 +59,7 @@ public class View_User extends JFrame {
     private JCheckBox elGamal_button;
     private JButton del_button;
     public JFrame error_msg;
+    private JButton addUser;
 
     public JList<String> selected_list;
 
@@ -89,8 +92,7 @@ public class View_User extends JFrame {
         fill_tab1();
         fill_tab2();
         fill_tab3();
-
-        add_action_listeners();
+        fill_tab4();
 
         this.setVisible(true);
         this.setResizable(false);
@@ -108,13 +110,14 @@ public class View_User extends JFrame {
         tabbedPane.add("Send message", p1);
         tabbedPane.add("Receive message", p2);
         tabbedPane.add("Edit KeyRing", p3);
+        tabbedPane.add("User settings", p4);
 
         this.add(tabbedPane, BorderLayout.CENTER);
 
         p1.setLayout(new BorderLayout());
         p2.setLayout(new BorderLayout());
         p3.setLayout(new BorderLayout());
-
+        p4.setLayout(new BorderLayout());
     }
     private void fill_tab1(){
         //Message Sending
@@ -567,7 +570,45 @@ public class View_User extends JFrame {
         p3.add(adition);
 
     }
+    private void fill_tab4(){
 
+        JPanel change_user = new JPanel(null);
+        change_user.setBorder(new TitledBorder(""));
+
+        JPanel show_panel = new JPanel(null);
+        show_panel.setBorder(new TitledBorder(""));
+
+        JPanel del_panel = new JPanel();
+        del_panel.setBorder(new TitledBorder(""));
+
+        JLabel change_text = new JLabel("Current user: ");
+        change_text.setBounds(450,60,500,50);
+        change_text.setFont(new Font("Texas", Font.ITALIC, 28));
+        change_user.add(change_text);
+
+
+        change_user.add(show_panel);
+
+        change_user.setPreferredSize(new Dimension(40, 40));
+        Font myFont = new Font("Texas", Font.ITALIC, 18);
+
+        addUser = new JButton("Change user");
+
+        addUser.setBounds(600,500,200,50);
+        addUser.setFont(new Font("Texas",Font.BOLD,28));
+
+
+        change_user.add(addUser);
+
+        //Vector<String> choosenUser = User.getAllUsers();
+        String[] choosenUser = {"USERR"};
+        JComboBox<String> jComboBox = new JComboBox<>(choosenUser);
+        jComboBox.setBounds(650,70,180,40);
+
+        change_user.add(jComboBox);
+        p4.add(change_user);
+
+    }
     private void add_action_listeners(){
 
         generate_dsa.addActionListener( e -> {
