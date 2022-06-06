@@ -19,7 +19,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -59,8 +58,8 @@ public class View_User extends JFrame {
     private JCheckBox elGamal_button;
     private JButton del_button;
     public JFrame error_msg;
-    private JButton addUser;
-
+    private JButton change_key_btn;
+    private JComboBox<String> userChoice;
     public JList<String> selected_list;
 
     private View_User() {
@@ -85,7 +84,7 @@ public class View_User extends JFrame {
             }
         });
 
-                    selected_list = null;
+        selected_list = null;
         fill_space();
         setBounds(300, 150, 1300, 800);
 
@@ -93,6 +92,7 @@ public class View_User extends JFrame {
         fill_tab2();
         fill_tab3();
         fill_tab4();
+        add_action_listeners();
 
         this.setVisible(true);
         this.setResizable(false);
@@ -582,7 +582,7 @@ public class View_User extends JFrame {
         del_panel.setBorder(new TitledBorder(""));
 
         JLabel change_text = new JLabel("Current user: ");
-        change_text.setBounds(450,60,500,50);
+        change_text.setBounds(500,60,500,50);
         change_text.setFont(new Font("Texas", Font.ITALIC, 28));
         change_user.add(change_text);
 
@@ -592,20 +592,20 @@ public class View_User extends JFrame {
         change_user.setPreferredSize(new Dimension(40, 40));
         Font myFont = new Font("Texas", Font.ITALIC, 18);
 
-        addUser = new JButton("Change user");
+        change_key_btn = new JButton("Change user");
 
-        addUser.setBounds(600,500,200,50);
-        addUser.setFont(new Font("Texas",Font.BOLD,28));
+        change_key_btn.setBounds(550,350,150,60);
+        change_key_btn.setFont(new Font("Texas",Font.BOLD, 28));
+
+        Vector<String> optionsToChoose = User.getAllUsers();
+
+        userChoice = new JComboBox<>(optionsToChoose);
+        userChoice.setBounds(700,70,200,40);
+        change_user.add(userChoice);
+        change_user.add(change_key_btn);
 
 
-        change_user.add(addUser);
 
-        //Vector<String> choosenUser = User.getAllUsers();
-        String[] choosenUser = {"USERR"};
-        JComboBox<String> jComboBox = new JComboBox<>(choosenUser);
-        jComboBox.setBounds(650,70,180,40);
-
-        change_user.add(jComboBox);
         p4.add(change_user);
 
     }
