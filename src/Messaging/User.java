@@ -105,6 +105,7 @@ public class User {
         return returnVector;
     }
 
+    // mora da se napravi i kad ima subkey-eve da radi
     public static void addPublicKeyRing(String username, PGPPublicKeyRing pkr) {
         User user = userMap.get(username);
 //        publicKeyRings.addElement(pkr);
@@ -120,6 +121,7 @@ public class User {
         publicKeyRingHashMap.replace(username, pkr);
     }
 
+    // mora da se napravi i kad ima subkey-eve da radi
     public static void addSecretKeyRing(String username, PGPSecretKeyRing skr) {
         User user = userMap.get(username);
         user.secretKeyRing = skr;

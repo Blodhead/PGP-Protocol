@@ -129,7 +129,7 @@ public class KeyRings {
                 PGPKeyRingGenerator keyRingGen = new PGPKeyRingGenerator(
                         PGPSignature.POSITIVE_CERTIFICATION,
                         kp,
-                        username,
+                        username + " <" + mail + ">",
                         sha1Calc,
                         null,
                         null,
