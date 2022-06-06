@@ -22,6 +22,7 @@
         import java.io.FileOutputStream;
         import java.security.KeyPair;
         import java.security.KeyStore;
+        import java.security.KeyStoreSpi;
         import java.util.Base64;
         import java.util.Vector;
 
@@ -644,7 +645,7 @@ public class View_User extends JFrame {
                     String strArray[] = s.split(" ");
                     PublicKeyElem pub = User.getPublicKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
                     try {
-                        //KeyStore keyStore = new KeyStore("pgp.keystore", "BC");
+//                        KeyStore keyStore = new KeyStore("pgp.keystore", "BC");
                         /*PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(pub.getAlgorithm(), PGPUtil.SHA1, "BC");
                         PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
                         signatureGenerator.generateOnePassVersion(false).encode(compressedOut);*/

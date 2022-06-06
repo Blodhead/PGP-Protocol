@@ -148,9 +148,10 @@ public class KeyRings {
                 publicKeyRingCollection = PGPPublicKeyRingCollection.addPublicKeyRing(publicKeyRingCollection, pkr);//DRUGI PUT KAD SE GENERISE KLJUC ISKACE ERROR
 
 
-                User user = User.getUser(username);
-                user.addPrivateKey(algo, skr.getSecretKey());
-                user.addPublicKey(algo, pkr.getPublicKey());
+                User.addPublicKeyRing(username, pkr);
+                User.addSecretKeyRing(username, skr);
+//                user.addPrivateKey(algo, skr.getSecretKey());
+//                user.addPublicKey(algo, pkr.getPublicKey());
 
             }
         }
@@ -161,7 +162,7 @@ public class KeyRings {
 
 
 
-                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
+//                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
 
                 PGPKeyPair kp = generateNewKeyPair(algo, size, password);
 
@@ -170,9 +171,26 @@ public class KeyRings {
 //                PGPPublicKeyRing.insertPublicKey(publicKeyRing, kp.getPublicKey());
                 krg.addSubKey(kp);
 
-                User user = User.getUser(username);
-                user.addPrivateKey(algo, krg.generateSecretKeyRing().getSecretKey());
-                user.addPublicKey(algo, krg.generatePublicKeyRing().getPublicKey());
+                PGPSecretKeyRing skr = krg.generateSecretKeyRing();
+                PGPPublicKeyRing pkr = krg.generatePublicKeyRing();
+
+                PGPPublicKey pk = null;
+                PGPSecretKey sk = null;
+
+                for (Iterator<PGPSecretKey> iterator = skr.getSecretKeys(); iterator.hasNext(); ) {
+                    sk = iterator.next();
+                }
+
+                for (Iterator<PGPPublicKey> iterator = skr.getPublicKeys(); iterator.hasNext(); ) {
+                    pk = iterator.next();
+                }
+
+                User.addPublicSubKey(username, pkr, pk);
+                User.addSecretSubKey(username, skr, sk);
+
+//                User user = User.getUser(username);
+//                user.addPrivateKey(algo, krg.generateSecretKeyRing().getSecretKey());
+//                user.addPublicKey(algo, krg.generatePublicKeyRing().getPublicKey());
 
             }
             catch (NoSuchElementException e) {
