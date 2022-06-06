@@ -575,11 +575,10 @@ public class View_User extends JFrame {
         generate_dsa.addActionListener( e -> {
 
             try {
-                String str_dsa,str_el;
                 if(dsa_button.isSelected())
-                    str_dsa = KeyRings.generateNewUserKeyPair("DSA",username.getText(), String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
+                    KeyRings.generateNewUserKeyPair("DSA",username.getText(), String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
                 else
-                    str_el = KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
+                    KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
 
                 View_User.private_list.removeAll(private_list);
                 View_User.private_list.addAll(User.getSecretKeys(username.getText()));
@@ -654,11 +653,9 @@ public class View_User extends JFrame {
             returnVal = chooser.showSaveDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION){
-                //File fileToSave = chooser.getSelectedFile();
                 ////////////////////PUBLIC KEY
                 if(selected_list == public_JList){
                     PGPPublicKeyRing pkr = User.getPublicKeyRing(selected_list.getSelectedValue());
-                    //File f = new File(chooser.getSelectedFile().getAbsolutePath());
                     try (ArmoredOutputStream out = new ArmoredOutputStream(new FileOutputStream(chooser.getSelectedFile() + "-public.asc"))) {
                         pkr.encode(out);
                     } catch (Exception e) {
@@ -684,19 +681,30 @@ public class View_User extends JFrame {
 
         imp_key_button.addActionListener(ae -> {
             JFileChooser chooser = new JFileChooser();
-            File fileToSave = chooser.getSelectedFile();
+            File fileToLoad;
             FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
             chooser.setFileFilter(filter);
+            boolean good_choice = false;
+            int returnVal;
 
-            int returnVal = chooser.showOpenDialog(null);
+            while(!good_choice) {
+                returnVal = chooser.showOpenDialog(null);
+                if (returnVal == JFileChooser.APPROVE_OPTION){
+                    fileToLoad = chooser.getSelectedFile();
+                    if(fileToLoad.getName().contains("private.asc") == true){
+                        ///
+                        good_choice = true;
+                    }else if(fileToLoad.getName().contains("public.asc") == true) {
+                        ///
+                        good_choice = true;
+                    }else{
+                        JOptionPane.showMessageDialog(error_msg,
+                                "Choose a valid private or public key ring!",
+                                "Error message",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
 
-            if (returnVal != JFileChooser.APPROVE_OPTION)
-                return;
-
-            try {
-
-            } catch (Exception ex) {
-
+                }else return;
             }
 
         });
