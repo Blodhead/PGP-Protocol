@@ -138,83 +138,31 @@ public class User {
     }
 
     public static void removePublicKey(String keyId) {
+        // uklanjanje kljuca iz mape
+        PGPPublicKey pk = publicMap.get(keyId);
+        publicMap.remove(keyId);
 
+        //
+        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(pk.getUserIDs().next());
+        pkr = pkr.removePublicKey(pkr, pk);
+        publicKeyRingHashMap.replace(pk.getUserIDs().next(), pkr);
     }
 
     public static void removePrivateKey(String keyId) {
-
+        PGPSecretKey sk = secretMap.get(keyId);
+        secretMap.remove(keyId);
+        PGPSecretKeyRing skr = secretKeyRingHashMap.get(sk.getUserIDs().next());
+        skr = skr.removeSecretKey(skr, sk);
+        secretKeyRingHashMap.replace(sk.getUserIDs().next(), skr);
+        userMap.get(sk.getUserIDs().next()).secretKeyRing = skr;
     }
 
+    public static Vector<String> getAllUsers() {
+        Vector<String> vector = new Vector<>();
+        vector.addAll(userMap.keySet());
+        return vector;
+    }
 
-//    private String username;
-//
-//    static private ArrayList<PublicKeyElem> publicKeyRingList = new ArrayList<PublicKeyElem>();
-//    private ArrayList<PrivateKeyElem> privateKeyRing;
-//
-//    private static HashMap<String, User> userMap = new HashMap<String, User>();
-//
-//    private User(String username) {
-//        this.username = username;
-//        this.privateKeyList = new ArrayList<PrivateKeyElem>();
-//    }
-//
-//    public static User getUser(String username) {
-//        if (!userMap.containsKey(username))
-//            userMap.put(username, new User(username));
-//
-//        return userMap.get(username);
-//    }
-//
-//    public void addPublicKey(String algo, PGPPublicKey pk) {
-//        publicKeyList.add(new PublicKeyElem(algo, username, pk));
-//    }
-//
-//    public void addPrivateKey(String algo, PGPSecretKey pkr) {
-//        privateKeyList.add(new PrivateKeyElem(algo, username, pkr));
-//    }
-//
-//    public static ArrayList<PrivateKeyElem> getUserPrivateKeys(String username) {
-//        User user = userMap.get(username);
-//        return user.privateKeyList;
-//    }
-//
-//    public static Vector<String> getUserPrivateKeysString(String username) {
-//        User user = userMap.get(username);
-//
-//        Vector<String> str = new Vector<String>();
-//        for(PrivateKeyElem elem: user.privateKeyList)
-//            str.add(elem.toString());
-//
-//        return str;
-//    }
-//
-//    public static ArrayList<PublicKeyElem> getPublicKeys() {
-//        return publicKeyList;
-//    }
-//
-//    public static ArrayList<String> getPublicKeysString() {
-//        ArrayList<String> str = new ArrayList<String>();
-//        for(PublicKeyElem elem: publicKeyList)
-//            str.add(elem.toString());
-//
-//        return str;
-//    }
-//
-//    public static PublicKeyElem getPublicKey(String username, long ID) {
-//        for (PublicKeyElem elem: publicKeyList)
-//            if (elem.getUsername().equals(username) && elem.getKeyId() == ID)
-//                return elem;
-//
-//        return null;
-//    }
-//
-//    public static PrivateKeyElem getSecretKey(String username, long ID) {
-//        for (PrivateKeyElem elem: getUserPrivateKeys(username))
-//            if (elem.getKeyId() == ID)
-//                return elem;
-//
-//        return null;
-//    }
-//
+    
 
 }
