@@ -57,7 +57,7 @@ public class View_User extends JFrame {
     private JButton generate_dsa;
     private JCheckBox dsa_button;
     private JCheckBox elGamal_button;
-
+    private JButton del_button;
     public JFrame error_msg;
 
     public JList<String> selected_list;
@@ -553,7 +553,7 @@ public class View_User extends JFrame {
                 del_txt.setBounds(20, 30, 200, 25);
                 delete_key.add(del_txt);
 
-                JButton del_button = new JButton("Delete");
+                del_button = new JButton("Delete");
                 del_button.setBounds(170, 230, 100, 30);
                 delete_key.add(del_button);
             }
@@ -705,6 +705,16 @@ public class View_User extends JFrame {
                     }
 
                 }else return;
+            }
+
+        });
+
+        del_button.addActionListener(e -> {
+
+            if(selected_list == public_JList){
+                User.removePublicKey(selected_list.getSelectedValue());//#keyId
+            }else if(selected_list == private_Jlist){
+                User.removePrivateKey(selected_list.getSelectedValue());//#keyId
             }
 
         });

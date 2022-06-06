@@ -137,9 +137,13 @@ public class User {
         secretKeyRingHashMap.replace(username, skr);
     }
 
+    public static void removePublicKey(String keyId) {
 
+    }
 
+    public static void removePrivateKey(String keyId) {
 
+    }
 
 
 //    private String username;
