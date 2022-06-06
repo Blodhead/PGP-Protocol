@@ -76,7 +76,7 @@ public class User {
                 iterator.next();
                 isMaster = false;
                 returnVector.addElement(username);
-            }
+            }else
             returnVector.addElement(getString((PGPSecretKey) iterator.next()));
         }
 
@@ -97,7 +97,7 @@ public class User {
                     iterator.next();
                     isMaster = false;
                     returnVector.addElement(user.username);
-                }
+                }else
                 returnVector.addElement(getString((PGPPublicKey) iterator.next()));
             }
         }

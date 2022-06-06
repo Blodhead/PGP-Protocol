@@ -582,12 +582,12 @@ public class View_User extends JFrame {
 
 
                 View_User.private_list.removeAll(private_list);
-                View_User.private_list.addAll(User.getUserPrivateKeysString(username.getText()));
+                View_User.private_list.addAll(User.getSecretKeys(username.getText()));
 
                 private_Jlist.setListData(private_list);
 
                 View_User.public_list.removeAll(public_list);
-                View_User.public_list.addAll(User.getPublicKeysString());
+                View_User.public_list.addAll(User.getPublicKeys());
 
                 public_JList.setListData(public_list);
 
@@ -655,7 +655,7 @@ public class View_User extends JFrame {
                 if(selected_list == public_JList){
                    String s = public_JList.getSelectedValue();
                     String strArray[] = s.split(" ");
-                    PublicKeyElem pub = User.getPublicKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
+                    //PublicKeyElem pub = User.getPublicKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
                     try {
 
 
@@ -672,7 +672,7 @@ public class View_User extends JFrame {
                 else if(selected_list == private_Jlist){
                     String s = private_Jlist.getSelectedValue();
                     String strArray[] = s.split(" ");
-                    PrivateKeyElem pub = User.getSecretKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
+                    //PrivateKeyElem pub = User.getSecretKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
 
                     try {
                         FileOutputStream public_out = new FileOutputStream(fileToSave.getName()+".asc");

@@ -28,9 +28,10 @@ public class AppClass {
             throw new RuntimeException(e);
         }
 
-
+    User u1 = new User("Milos", "123456");
 
         View_User.getUser_view();
+
     }
 
 
