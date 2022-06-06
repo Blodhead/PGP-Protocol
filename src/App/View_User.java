@@ -1,31 +1,25 @@
 
-        package App;
+package App;
 
-        import Messaging.KeyRings;
-        import Messaging.PrivateKeyElem;
-        import Messaging.PublicKeyElem;
-        import Messaging.User;
-        import org.bouncycastle.openpgp.*;
-        import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
+import Messaging.KeyRings;
+import Messaging.PrivateKeyElem;
+import Messaging.PublicKeyElem;
+import Messaging.User;
+import org.bouncycastle.openpgp.*;
 
-        import javax.swing.*;
-        import javax.swing.UIManager.LookAndFeelInfo;
-        import javax.swing.border.EmptyBorder;
-        import javax.swing.border.TitledBorder;
-        import javax.swing.filechooser.FileNameExtensionFilter;
-        import javax.swing.filechooser.FileSystemView;
-        import java.awt.*;
-        import java.awt.event.WindowAdapter;
-        import java.awt.event.WindowEvent;
-        import java.io.File;
-        import java.io.FileNotFoundException;
-        import java.io.FileOutputStream;
-        import java.security.KeyPair;
-        import java.security.KeyStore;
-        import java.util.Base64;
-        import java.util.Vector;
-
-//import static javax.swing.JOptionPane.showMessageDialog; needed for messages alert
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.Vector;
 
 public class View_User extends JFrame {
 
@@ -62,6 +56,7 @@ public class View_User extends JFrame {
     private JCheckBox dsa_button;
     private JCheckBox elGamal_button;
 
+    public JFrame error_msg;
 
     public JList<String> selected_list;
 
@@ -380,6 +375,9 @@ public class View_User extends JFrame {
         Font myFont = new Font("Texas", Font.ITALIC, 18);
         JPanel gen_panel = new JPanel(new BorderLayout());
 
+        error_msg = new JFrame();
+        error_msg.setBounds(150, 150, 250, 250);
+
         //////////////////////GENERATE KEYS////////////////////
 
         {
@@ -575,10 +573,13 @@ public class View_User extends JFrame {
         generate_dsa.addActionListener( e -> {
 
             try {
+                String str_dsa,str_el;
                 if(dsa_button.isSelected())
-                KeyRings.generateNewUserKeyPair("DSA",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
+                    str_dsa = KeyRings.generateNewUserKeyPair("DSA",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
                 else
-                    KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
+                    str_el = KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),pass_field.getPassword().toString(),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
+
+
 
                 View_User.private_list.removeAll(private_list);
                 View_User.private_list.addAll(User.getUserPrivateKeysString(username.getText()));
@@ -618,38 +619,45 @@ public class View_User extends JFrame {
         });
 
         exp_button.addActionListener(ae -> {
+
             JFileChooser chooser;
 
             if(selected_list != null)
             chooser = new JFileChooser();
             else return;
 
+            if((selected_list.getSelectedValue().toCharArray())[0] != '#'){
+                if(selected_list == public_JList)
+                JOptionPane.showMessageDialog(error_msg,
+                        "Choose a valid user to export his public keys!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                else if(selected_list == private_Jlist)
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Choose user to export private key!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+
             FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
             chooser.setFileFilter(filter);
 
             int returnVal = 0;
 
-            if(selected_list == public_JList) {
-                chooser.setDialogTitle("Export file");
-                returnVal = chooser.showSaveDialog(null);
-            } else if (selected_list == private_Jlist) {
-                chooser.setDialogTitle("Import file");
-                returnVal = chooser.showSaveDialog(null);
-            }
+            chooser.setDialogTitle("Export file");
+            returnVal = chooser.showSaveDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION){
                 File fileToSave = chooser.getSelectedFile();
+                ////////////////////PUBLIC KEY
                 if(selected_list == public_JList){
                    String s = public_JList.getSelectedValue();
                     String strArray[] = s.split(" ");
                     PublicKeyElem pub = User.getPublicKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
                     try {
-                        //KeyStore keyStore = new KeyStore("pgp.keystore", "BC");
-                        /*PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(pub.getAlgorithm(), PGPUtil.SHA1, "BC");
-                        PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
-                        signatureGenerator.generateOnePassVersion(false).encode(compressedOut);*/
-                        //PGPKeyPair        elgKeyPair = new JcaPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
-                        //Base64.getEncoder().encode();
+
 
                         FileOutputStream public_out = new FileOutputStream(fileToSave.getName()+".asc");
 
@@ -660,16 +668,20 @@ public class View_User extends JFrame {
                     }
 
                 }
+                //////////////////////PRIVATE KEY
                 else if(selected_list == private_Jlist){
                     String s = private_Jlist.getSelectedValue();
+                    String strArray[] = s.split(" ");
+                    PrivateKeyElem pub = User.getSecretKey(strArray[1].substring(1),Long.parseLong(strArray[2].substring(1)));
+
+                    try {
+                        FileOutputStream public_out = new FileOutputStream(fileToSave.getName()+".asc");
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+
                 }
             }
-
-/*
-        PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
-        PGPKeyPair          keyPair = new JcaPGPKeyPair(PGPPublicKey.RSA_GENERAL, pair, new Date());
-        PGPSecretKey        secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, keyPair, identity, sha1Calc, null, null, new JcaPGPContentSignerBuilder(keyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA256), new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).setProvider("BC").build(passPhrase));
-        */
 
             });
 
@@ -699,6 +711,7 @@ public class View_User extends JFrame {
             selected_list = private_Jlist;
 
         });
+
         public_JList.addListSelectionListener(e -> {
              if(selected_list == private_Jlist){
                  private_Jlist.clearSelection();
@@ -710,6 +723,7 @@ public class View_User extends JFrame {
             dsa_choice.setEnabled(true);
             elGamal_choice.setEnabled(false);
         });
+
         elGamal_button.addActionListener(e -> {
             elGamal_choice.setEnabled(true);
             dsa_choice.setEnabled(false);
