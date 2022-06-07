@@ -9,6 +9,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,11 +20,13 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Vector;
 
 public class View_User extends JFrame {
 
     private static View_User u1;
+    private User current_user;
 
     private final JPanel p1 = new JPanel();
     private final JPanel p2 = new JPanel();
@@ -58,9 +61,13 @@ public class View_User extends JFrame {
     private JCheckBox elGamal_button;
     private JButton del_button;
     public JFrame error_msg;
-    private JButton change_key_btn;
     private JComboBox<String> userChoice;
     public JList<String> selected_list;
+    public JButton registerUser;
+    private JTextField reg_username;
+    private JTextField reg_mail;
+    private JPasswordField reg_pass;
+    private Vector<String> optionsToChoose;
 
     private View_User() {
         super("Pretty Good Privacy protocol");
@@ -572,41 +579,69 @@ public class View_User extends JFrame {
     }
     private void fill_tab4(){
 
-        JPanel change_user = new JPanel(null);
-        change_user.setBorder(new TitledBorder(""));
+///////////////////////////ChangeUser Panel////////////////////////////
 
         JPanel show_panel = new JPanel(null);
         show_panel.setBorder(new TitledBorder(""));
+        show_panel.setPreferredSize(new Dimension(400,500));
 
-        JPanel del_panel = new JPanel();
-        del_panel.setBorder(new TitledBorder(""));
+        optionsToChoose = User.getAllUsers();
 
         JLabel change_text = new JLabel("Current user: ");
-        change_text.setBounds(500,60,500,50);
+        change_text.setBounds(100,60,300,50);
         change_text.setFont(new Font("Texas", Font.ITALIC, 28));
-        change_user.add(change_text);
-
-
-        change_user.add(show_panel);
-
-        change_user.setPreferredSize(new Dimension(40, 40));
-        Font myFont = new Font("Texas", Font.ITALIC, 18);
-
-        change_key_btn = new JButton("Change user");
-
-        change_key_btn.setBounds(550,350,150,60);
-        change_key_btn.setFont(new Font("Texas",Font.BOLD, 28));
-
-        Vector<String> optionsToChoose = User.getAllUsers();
+        show_panel.add(change_text);
 
         userChoice = new JComboBox<>(optionsToChoose);
-        userChoice.setBounds(700,70,200,40);
-        change_user.add(userChoice);
-        change_user.add(change_key_btn);
+        userChoice.setBounds(300,70,200,40);
+        show_panel.add(userChoice);
 
+///////////////////////////AddUser Panel////////////////////////////
+        JPanel del_panel = new JPanel(null);
+        del_panel.setBorder(new TitledBorder(""));
 
+        JLabel register_user = new JLabel("Register new User: ");
+        register_user.setBounds(200,60,300,50);
+        register_user.setFont(new Font("Texas", Font.ITALIC, 28));
+        del_panel.add(register_user);
 
-        p4.add(change_user);
+        Font myFont = new Font("Texas", Font.ITALIC, 18);
+
+        JLabel name_txt = new JLabel("Name: ");
+        name_txt.setBounds(140, 170, 70, 20);
+        name_txt.setFont(myFont);
+        del_panel.add(name_txt);
+
+        reg_username = new JTextField();
+        reg_username.setBounds(240, 168, 150, 30);
+        del_panel.add(reg_username);
+
+        JLabel mail_text = new JLabel("E-mail: ");
+        mail_text.setBounds(140, 244, 70, 20);
+        mail_text.setFont(myFont);
+        del_panel.add(mail_text);
+
+        reg_mail = new JTextField();
+        reg_mail.setBounds(240, 243, 150, 30);
+        del_panel.add(reg_mail);
+
+        JLabel pass_text = new JLabel("Password: ");
+        pass_text.setBounds(140, 318, 100, 20);
+        pass_text.setFont(myFont);
+        del_panel.add(pass_text);
+
+        reg_pass = new JPasswordField();
+        reg_pass.setBounds(240, 317, 150, 30);
+        del_panel.add(reg_pass);
+
+        registerUser = new JButton("Register");
+        registerUser.setBounds(260,380,100,30);
+        del_panel.add(registerUser);
+
+        show_panel.setMinimumSize(new Dimension(640,800));
+        del_panel.setMinimumSize(new Dimension(630,800));
+        JSplitPane change_user_page = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,show_panel,del_panel);
+        p4.add(change_user_page);
 
     }
     private void add_action_listeners(){
@@ -783,7 +818,30 @@ public class View_User extends JFrame {
             dsa_choice.setEnabled(false);
         });
 
+        userChoice.addActionListener(e ->{
 
+            current_user = User.getUser(String.valueOf(userChoice.getSelectedItem()));
+
+        });
+
+        registerUser.addActionListener(e -> {
+            if(reg_mail.getText() == "" || Arrays.toString(reg_pass.getPassword()) == "" || reg_username.getText() == ""){
+                JOptionPane.showMessageDialog(error_msg,
+                        "All fields must be filled!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(User.getUser(reg_username.getText()) != null){
+                JOptionPane.showMessageDialog(error_msg,
+                        "User already exists!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            optionsToChoose.add(reg_username.getText());
+            new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword()));
+        });
 
     }
 

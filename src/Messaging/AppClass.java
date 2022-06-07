@@ -29,6 +29,7 @@ public class AppClass {
         }
 
     User u1 = new User("Milos", "123456");
+    User u2 = new User("Ksenija", "123456");
 
         View_User.getUser_view();
 

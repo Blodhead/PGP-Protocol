@@ -163,6 +163,10 @@ public class User {
         return vector;
     }
 
+    public static User getUser(String username){
+        return userMap.get(username);
+    }
+
     
 
 }
