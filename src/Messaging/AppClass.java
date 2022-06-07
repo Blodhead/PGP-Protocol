@@ -18,15 +18,15 @@ public class AppClass {
 
         KeyRings kr = new KeyRings();
 
-        String msg = "";
-        System.out.println("Hello world");
+//        String msg = "";
+//        System.out.println("Hello world");
 
-        try {
-            Zipping.zip("test.txt", "compressed.zip");
-            Zipping.unzip("compressed.zip", "unziped.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            Zipping.zip("test.txt", "compressed.zip");
+//            Zipping.unzip("compressed.zip", "unziped.txt");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
     User u1 = new User("Milos", "123456");
     User u2 = new User("Ksenija", "123456");

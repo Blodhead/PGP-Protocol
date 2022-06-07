@@ -57,10 +57,12 @@ public class User {
         return "#" + pk.getKeyID();
     }
 
+    // moze da bubde null
     public static PGPSecretKeyRing getSecretKeyRing(String username) {
         return secretKeyRingHashMap.get(username);
     }
 
+    // moze da bude null
     public static PGPPublicKeyRing getPublicKeyRing(String username) {
         return publicKeyRingHashMap.get(username);
     }
@@ -69,6 +71,10 @@ public class User {
         User user = userMap.get(username);
 
         Vector<String> returnVector = new Vector<>();
+
+        if (user == null || user.secretKeyRing == null)
+            return returnVector;
+
         boolean isMaster = true;
 
         for (Iterator<PGPSecretKey> iterator = user.secretKeyRing.getSecretKeys(); iterator.hasNext(); ) {
@@ -90,6 +96,10 @@ public class User {
         Vector<String> returnVector = new Vector<>();
 
         for (User user: userMap.values()) {
+
+            if (publicKeyRingHashMap.get(user.username) == null)
+                continue;
+
             boolean isMaster = true;
 
             for (Iterator<PGPPublicKey> iterator = publicKeyRingHashMap.get(user.username).getPublicKeys(); iterator.hasNext(); ) {
