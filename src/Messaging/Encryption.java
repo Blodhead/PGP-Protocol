@@ -10,6 +10,7 @@ import org.bouncycastle.openpgp.operator.bc.*;
 import org.bouncycastle.util.io.Streams;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Provider;
@@ -42,8 +43,8 @@ public class Encryption {
     {
 
         // Initialize Bouncy Castle security provider
-        Provider provider = new BouncyCastleProvider();
-        Security.addProvider(provider);
+//        Provider provider = new BouncyCastleProvider();
+//        Security.addProvider(provider);
 
         OutputStream out = new FileOutputStream(fileName + ".pgp");
 
@@ -57,23 +58,34 @@ public class Encryption {
         PGPEncryptedDataGenerator encryptedDataGenerator = null;
 
         if (encrypt) {
+
+            // biranje algoritma
             if (is3DES) {
                 dataEncryptor = new BcPGPDataEncryptorBuilder(PGPEncryptedData.TRIPLE_DES);
             }
             else {
                 dataEncryptor = new BcPGPDataEncryptorBuilder(PGPEncryptedData.IDEA);
             }
+
+            // nesto radi
             dataEncryptor.setWithIntegrityPacket(true);
+
+            // generisanje sesijskog kljuca
             dataEncryptor.setSecureRandom(new SecureRandom());
 
+            // inicijalizacija enkriptora podataka
             encryptedDataGenerator = new PGPEncryptedDataGenerator(dataEncryptor);
 
+            // provarava da li je kljuc ElGamal
             if (!publicKey.isEncryptionKey()) {
                 // error
                 return;
             }
 
+            // enkriptovanje sesijskog kljuca
             encryptedDataGenerator.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(publicKey));
+
+            // enkriptovanje poruke
             out = encryptedDataGenerator.open(out, new byte[Encryption.BUFFER_SIZE]);
 
         }
@@ -88,31 +100,41 @@ public class Encryption {
 
         if (sign) {
 
+            // da li je DSA kljuc
             if (!secretKey.isSigningKey()) {
                 // error
                 return;
             }
 
+            // dohvata pravi private key
             PGPPrivateKey privateKey = findPrivateKey(secretKey, password);
+
+            // generise i nicijalizuje sign generator
             PGPContentSignerBuilder signerBuilder = new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(),
                     HashAlgorithmTags.SHA1);
             signatureGenerator = new PGPSignatureGenerator(signerBuilder);
             signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, privateKey);
 
 
-            Iterator<String> it = secretKey.getPublicKey().getUserIDs();
-//            if (it.hasNext()) {
+            String username = secretKey.getPublicKey().getUserIDs().next();
+
+            //
             PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
                 //noinspection deprecation
-            spGen.setSignerUserID(false, secretKey.getUserIDs().next());
+
+            // podesi koji je user
+            spGen.setSignerUserID(false, username.getBytes(StandardCharsets.UTF_8)); // mozda dodje do greske
+//            spGen.setSignerUserID(false, username);
+
+            // doda heshiran deo potpisa
             signatureGenerator.setHashedSubpackets(spGen.generate());
-//            }
+
             signatureGenerator.generateOnePassVersion(false).encode(out);
         }
 
-        // Initialize literal data generator
-        PGPLiteralDataGenerator literalDataGenerator = new PGPLiteralDataGenerator();
-        OutputStream literalOut = literalDataGenerator.open(
+        // Pravljenje header-a
+        PGPLiteralDataGenerator headerDataGenerator = new PGPLiteralDataGenerator();
+        OutputStream literalOut = headerDataGenerator.open(
                 out,
                 PGPLiteralData.BINARY,
                 fileName,
@@ -120,17 +142,23 @@ public class Encryption {
                 new byte [Encryption.BUFFER_SIZE] );
 
         // Main loop - read the "in" stream, compress, encrypt and write to the "out" stream
+
+        // dohvatanje plain teksta
         FileInputStream in = new FileInputStream(fileName);
         byte[] buf = new byte[Encryption.BUFFER_SIZE];
         int len;
+
+        // sifruje chunk po chunk
         while ((len = in.read(buf)) > 0) {
+
+            // enkriptuje,
             literalOut.write(buf, 0, len);
             if (sign)
                 signatureGenerator.update(buf, 0, len);
         }
 
         in.close();
-        literalDataGenerator.close();
+        headerDataGenerator.close();
         // Generate the signature, compress, encrypt and write to the "out" stream
         if (sign)
             signatureGenerator.generate().encode(out);

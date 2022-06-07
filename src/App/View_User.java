@@ -36,17 +36,18 @@ public class View_User extends JFrame {
 
     private JCheckBox opt_authentication_check;
     private JComboBox<String> encryption_algorithm;
-    private JScrollPane private_key_pool;
 
-    public static JScrollPane private_key_pool1;
-    public static JScrollPane public_key_pool1;
+    private static JScrollPane public_key_pool1;
+    private static JScrollPane private_key_pool1;
+
+    public static JScrollPane private_key_pool3;
+    public static JScrollPane public_key_pool3;
 
     public static JList<String> private_Jlist;
     public static Vector<String> private_list;
     public static Vector<String> public_list;
     public static JList<String> public_JList;
 
-    private JScrollPane public_key_pool;
     private JButton exp_button;
     private JButton imp_key_button;
     private JPasswordField pass;
@@ -68,6 +69,9 @@ public class View_User extends JFrame {
     private JTextField reg_mail;
     private JPasswordField reg_pass;
     private Vector<String> optionsToChoose;
+    private JList<String> lista1;
+    private JList<Object> lista2;
+
 
     private View_User() {
         super("Pretty Good Privacy protocol");
@@ -195,10 +199,16 @@ public class View_User extends JFrame {
                 choose_enc_key.setFont(new Font("Texas", Font.ITALIC, 17));
                 temp2.add(choose_enc_key, BorderLayout.NORTH);
 
-                JList<String> lista = new JList<>();
-                private_key_pool = new JScrollPane(lista);
-                private_key_pool.setPreferredSize(new Dimension(300, 500));
-                temp2.add(private_key_pool, BorderLayout.CENTER);
+                public_list = new Vector<>();
+
+                lista1 = new JList<>(public_list.toArray(new String[0]));
+                lista1.setSelectedIndex(0);
+                lista1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+                public_key_pool1 = new JScrollPane(lista1);
+                public_key_pool1.setPreferredSize(new Dimension(300, 500));
+                temp2.add(public_key_pool1, BorderLayout.CENTER);
+
                 opt_encryption_body.add(temp2, BorderLayout.CENTER);
 
                 opt_encryption.add(opt_encryption_body, BorderLayout.CENTER);
@@ -242,10 +252,15 @@ public class View_User extends JFrame {
                 choose_aut_key.setFont(new Font("Texas", Font.ITALIC, 17));
                 temp3.add(choose_aut_key, BorderLayout.NORTH);
 
-                JList<String> lista2 = new JList<>(); ///LISTA JAVNIH KLJUCEVA
-                public_key_pool = new JScrollPane(lista2);
-                public_key_pool.setPreferredSize(new Dimension(300, 500));
-                temp3.add(public_key_pool, BorderLayout.CENTER);
+                private_list = new Vector<>();
+                lista2 = new JList<>(private_list.toArray(new String[0]));
+                lista2.setSelectedIndex(0);
+                lista2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+                private_key_pool1= new JScrollPane(lista2);
+                private_key_pool1.setPreferredSize(new Dimension(300, 500));
+                temp3.add(private_key_pool1, BorderLayout.CENTER);
                 opt_authentication_body.add(temp3, BorderLayout.CENTER);
 
 
@@ -481,14 +496,13 @@ public class View_User extends JFrame {
             priv_key.setBounds(100, 10, 150, 25);
             show_panel.add(priv_key);
 
-            private_list = new Vector<>();
             private_Jlist = new JList<>(private_list.toArray(new String[0]));
             private_Jlist.setSelectedIndex(0);
             private_Jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-            private_key_pool1 = new JScrollPane(private_Jlist);
-            private_key_pool1.setBounds(100, 40, 300, 330);
-            show_panel.add(private_key_pool1);
+            private_key_pool3 = new JScrollPane(private_Jlist);
+            private_key_pool3.setBounds(100, 40, 300, 330);
+            show_panel.add(private_key_pool3);
 
             ///LISTA JAVNIH KLJUCEVA
             JLabel publ_key = new JLabel("Public key ring:");
@@ -496,15 +510,13 @@ public class View_User extends JFrame {
             publ_key.setBounds(530, 10, 150, 25);
             show_panel.add(publ_key);
 
-
-            public_list = new Vector<>();
             public_JList = new JList<>(public_list.toArray(new String[0]));
             public_JList.setSelectedIndex(0);
             public_JList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-            public_key_pool1 =new JScrollPane(public_JList);
-            public_key_pool1.setBounds(530, 40, 300, 330);
-            show_panel.add(public_key_pool1);
+            public_key_pool3 =new JScrollPane(public_JList);
+            public_key_pool3.setBounds(530, 40, 300, 330);
+            show_panel.add(public_key_pool3);
 
         }
 
@@ -658,11 +670,13 @@ public class View_User extends JFrame {
                 View_User.private_list.addAll(User.getSecretKeys(username.getText()));
 
                 private_Jlist.setListData(private_list);
+                lista2.setListData(private_list);
 
                 View_User.public_list.removeAll(public_list);
                 View_User.public_list.addAll(User.getPublicKeys());
 
                 public_JList.setListData(public_list);
+                lista1.setListData(public_list);
 
 
             } catch (Exception ex) {
@@ -674,20 +688,20 @@ public class View_User extends JFrame {
         opt_encryption_check.addActionListener(e -> {
             if(!opt_encryption_check.isSelected()){
                 encryption_algorithm.setEnabled(false);
-                private_key_pool.setEnabled(false);
+                public_key_pool1.setEnabled(false);
             }else{
                 encryption_algorithm.setEnabled(true);
-                private_key_pool.setEnabled(true);
+                public_key_pool1.setEnabled(true);
             }
         });
 
         opt_authentication_check.addActionListener(e -> {
             if(!opt_authentication_check.isSelected()){
                 pass.setEnabled(false);
-                public_key_pool.setEnabled(false);
+                private_key_pool1.setEnabled(false);
             }else{
                 pass.setEnabled(true);
-                public_key_pool.setEnabled(true);
+                private_key_pool1.setEnabled(true);
             }
         });
 
@@ -696,15 +710,15 @@ public class View_User extends JFrame {
             JFileChooser chooser;
 
             if(selected_list != null)
-            chooser = new JFileChooser();
+                chooser = new JFileChooser();
             else return;
 
             if((selected_list.getSelectedValue().toCharArray())[0] == '#'){
                 if(selected_list == public_JList)
-                JOptionPane.showMessageDialog(error_msg,
-                        "Choose a valid user to export his public keys!",
-                        "Error message",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Choose a valid user to export his public keys!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
                 else if(selected_list == private_Jlist)
                     JOptionPane.showMessageDialog(error_msg,
                             "Choose user to export private key!",
@@ -751,7 +765,7 @@ public class View_User extends JFrame {
                 }
             }
 
-            });
+        });
 
         imp_key_button.addActionListener(ae -> {
             JFileChooser chooser = new JFileChooser();
@@ -795,16 +809,16 @@ public class View_User extends JFrame {
 
         private_Jlist.addListSelectionListener(e -> {
             if(selected_list == public_JList){
-                    public_JList.clearSelection();
+                public_JList.clearSelection();
             }
             selected_list = private_Jlist;
 
         });
 
         public_JList.addListSelectionListener(e -> {
-             if(selected_list == private_Jlist){
-                 private_Jlist.clearSelection();
-             }
+            if(selected_list == private_Jlist){
+                private_Jlist.clearSelection();
+            }
             selected_list = public_JList;
         });
 
@@ -839,8 +853,8 @@ public class View_User extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            optionsToChoose.add(reg_username.getText());
-            new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword()));
+            optionsToChoose.add(new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword())).toString());
+
         });
 
     }

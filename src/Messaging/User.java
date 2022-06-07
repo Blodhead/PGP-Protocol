@@ -167,6 +167,14 @@ public class User {
         return userMap.get(username);
     }
 
+
+    public static PGPPublicKey getPublicKey(String keyId) {
+        return publicMap.get(keyId);
+    }
+
+    public static PGPSecretKey getSecretKey(String keyId) {
+        return secretMap.get(keyId);
+    }
     
 
 }
