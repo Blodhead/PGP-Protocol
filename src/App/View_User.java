@@ -10,7 +10,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,10 +18,12 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Currency;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -75,10 +76,12 @@ public class View_User extends JFrame {
     private JList<Object> lista2;
     private JButton send;
     private JTextField plaintext_field;
-    private JFileChooser plaintext_file;
+    private File plaintext_file;
     private JLabel plaintext_file_label;
     private JButton choose_plaintext_file;
 
+    private JCheckBox plaintext_selected;
+    private JCheckBox file_selected;
 
     private View_User() {
         super("Pretty Good Privacy protocol");
@@ -150,6 +153,10 @@ public class View_User extends JFrame {
             text_panel.setPreferredSize(new Dimension(500,70));
             text_panel.setBorder(new TitledBorder(""));
 
+            plaintext_selected = new JCheckBox();
+            plaintext_selected.setBounds(40, 23,20,20);
+            text_panel.add(plaintext_selected);
+
             JLabel plaintext = new JLabel("Enter plaintext:");
             plaintext.setBounds(60,18,200,30);
             plaintext.setFont(new Font("Texas", Font.BOLD, 20));
@@ -161,23 +168,36 @@ public class View_User extends JFrame {
             text_panel.add(plaintext_field);
 
             JLabel or = new JLabel("OR");
-            or.setBounds(740,18, 30,30);
+            or.setBounds(730,18, 30,30);
             or.setFont(new Font("Texas", Font.BOLD, 20));
             text_panel.add(or);
 
+            file_selected = new JCheckBox();
+            file_selected.setBounds(800,23,20,20);
+            text_panel.add(file_selected);
+            file_selected.setSelected(true);
+            plaintext_field.setEnabled(false);
+
             JLabel choose_a_file = new JLabel("Choose a file: ");
             choose_a_file.setFont(new Font("Texas", Font.BOLD, 20));
-            choose_a_file.setBounds(830,18,140,30);
+            choose_a_file.setBounds(820,18,140,30);
             text_panel.add(choose_a_file);
 
             choose_plaintext_file = new JButton("Choose...");
-            choose_plaintext_file.setBounds(980,18, 90,30);
+            choose_plaintext_file.setBounds(960,18, 90,30);
             text_panel.add(choose_plaintext_file);
 
-            plaintext_file_label = new JLabel("))");
-            plaintext_file_label.setBounds(1080,20,100,30);
+            plaintext_file_label = new JLabel("");
+            plaintext_file_label.setBounds(1060,18,200,30);
+            //plaintext_file_label.setPreferredSize(new Dimension(100,30));
             text_panel.add(plaintext_file_label);
-////////////////////lsaiugdwigfowhfgohqwieg////////////////
+            plaintext_file_label.setVisible(false);
+
+            ButtonGroup btn_group = new ButtonGroup();
+
+            btn_group.add(plaintext_selected);
+            btn_group.add(file_selected);
+
             form.add(text_panel, BorderLayout.NORTH);
         }
         //////////////////////////////////OPTIONS///////////////////////////////////////////////
@@ -890,6 +910,23 @@ public class View_User extends JFrame {
             dsa_choice.setEnabled(false);
         });
 
+        plaintext_selected.addActionListener(e -> {
+            if(file_selected.isSelected() == false && plaintext_selected.isSelected() == true){
+                file_selected.setSelected(false);
+                plaintext_field.setEnabled(true);
+                choose_plaintext_file.setEnabled(false);
+            }
+
+        });
+
+        file_selected.addActionListener(e -> {
+            if(file_selected.isSelected() == true && plaintext_selected.isSelected() == false){
+                plaintext_selected.setSelected(false);
+                plaintext_field.setEnabled(false);
+                choose_plaintext_file.setEnabled(true);
+            }
+        });
+
         userChoice.addActionListener(e ->{
 
             current_user = User.getUser(String.valueOf(userChoice.getSelectedItem()));
@@ -918,15 +955,62 @@ public class View_User extends JFrame {
 
         send.addActionListener(e -> {
 
-            if(plaintext_field.getText().equals("")){
+            /////////////////////FILE/PLAINTEXT///////////////////
+            if((plaintext_selected.isSelected() == true && plaintext_field.getText().equals(""))||
+                    file_selected.isSelected() == true && plaintext_file == null){
                 JOptionPane.showMessageDialog(error_msg,
-                        "Plaintext can't be empty!",
+                        "Must choose plaintext or file to encrypt!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            File file_for_encryption = new File("encrypted_file.txt");
+            if(plaintext_selected.isSelected() == true){
+                FileWriter myWriter = null;
+                try{
+                    myWriter = new FileWriter(file_for_encryption);
+                    myWriter.write("Files in Java might be tricky, but it is fun enough!");
+                    myWriter.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }if(file_selected.isSelected() == true){
+                file_for_encryption = plaintext_file;
+            }
+
+            ///////////////////////////keys////////////////////////
+            if(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue() == null){
+                JOptionPane.showMessageDialog(error_msg,
+                        "Must choose a public key!!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(((JList<String>)private_key_pool1.getViewport().getView()).getSelectedValue() == null){
+                JOptionPane.showMessageDialog(error_msg,
+                        "Must choose a private key!!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ////////////////////////////password///////////////////////
+            if(pass.getPassword() == null) {
+                JOptionPane.showMessageDialog(error_msg,
+                        "Must enter a password!!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }else if(User.chechPassword(current_user.getUsername(),pass.getPassword())){
+                JOptionPane.showMessageDialog(error_msg,
+                        "Must enter a valid password!!",
                         "Error message",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
             try {
-                Encryption.signEncryptFile(plaintext_field.getText(),
+                Encryption.signEncryptFile(file_for_encryption.getPath(),
                         User.getPublicKey(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue()),
                         User.getSecretKey(((JList<String>)private_key_pool1.getViewport().getView()).getSelectedValue()),
                         pass.getPassword(),
@@ -942,6 +1026,17 @@ public class View_User extends JFrame {
 
         });
 
+        choose_plaintext_file.addActionListener(e -> {
+
+            JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+            int returnVal = chooser.showOpenDialog(null);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                plaintext_file = chooser.getSelectedFile(); //treba proveriti tipove
+                plaintext_file_label.setText(plaintext_file.getName());
+                plaintext_file_label.setFont(new Font("Texas",Font.ITALIC,18));
+                plaintext_file_label.setVisible(true);
+            }
+        });
     }
 
     public static void getUser_view() {//bice pozvana samo jednom
