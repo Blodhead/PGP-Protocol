@@ -954,61 +954,82 @@ public class View_User extends JFrame {
         });
 
         send.addActionListener(e -> {
-
+            File file_for_encryption;
             /////////////////////FILE/PLAINTEXT///////////////////
-            if((plaintext_selected.isSelected() == true && plaintext_field.getText().equals(""))||
-                    file_selected.isSelected() == true && plaintext_file == null){
-                JOptionPane.showMessageDialog(error_msg,
-                        "Must choose plaintext or file to encrypt!",
-                        "Error message",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            File file_for_encryption = new File("encrypted_file.txt");
-            if(plaintext_selected.isSelected() == true){
-                FileWriter myWriter = null;
-                try{
-                    myWriter = new FileWriter(file_for_encryption);
-                    myWriter.write("Files in Java might be tricky, but it is fun enough!");
-                    myWriter.close();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+            {
+                if ((plaintext_selected.isSelected() == true && plaintext_field.getText().equals("")) ||
+                        file_selected.isSelected() == true && plaintext_file == null) {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Must choose plaintext or file to encrypt!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-            }if(file_selected.isSelected() == true){
-                file_for_encryption = plaintext_file;
-            }
 
-            ///////////////////////////keys////////////////////////
-            if(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue() == null){
-                JOptionPane.showMessageDialog(error_msg,
-                        "Must choose a public key!!",
-                        "Error message",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if(((JList<String>)private_key_pool1.getViewport().getView()).getSelectedValue() == null){
-                JOptionPane.showMessageDialog(error_msg,
-                        "Must choose a private key!!",
-                        "Error message",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+                file_for_encryption = new File("encrypted_file.txt");
+                if (plaintext_selected.isSelected() == true) {
+                    FileWriter myWriter = null;
+                    try {
+                        myWriter = new FileWriter(file_for_encryption);
+                        myWriter.write("Files in Java might be tricky, but it is fun enough!");
+                        myWriter.close();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                if (file_selected.isSelected() == true) {
+                    file_for_encryption = plaintext_file;
+                }
 
+                ///////////////////////////keys////////////////////////
+                if (((JList<String>) public_key_pool1.getViewport().getView()).getSelectedValue() == null) {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Must choose a public key!!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue() == null) {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Must choose a private key!!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (((((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue())).charAt(0) == '#') {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Choose a private dsa key!!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (((((JList<String>) public_key_pool1.getViewport().getView()).getSelectedValue())).charAt(0) != '#') {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Choose a public dsa key!!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
             ////////////////////////////password///////////////////////
-            if(pass.getPassword() == null) {
-                JOptionPane.showMessageDialog(error_msg,
-                        "Must enter a password!!",
-                        "Error message",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }else if(User.chechPassword(current_user.getUsername(),pass.getPassword())){
-                JOptionPane.showMessageDialog(error_msg,
-                        "Must enter a valid password!!",
-                        "Error message",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
+            {
+                if (pass.getPassword() == null) {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Must enter a password!!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else if (!User.CheckPassword(current_user.getUsername(), String.valueOf(pass.getPassword()))) {
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Must enter a valid password!!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
+
             try {
                 Encryption.signEncryptFile(file_for_encryption.getPath(),
                         User.getPublicKey(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue()),
@@ -1024,6 +1045,18 @@ public class View_User extends JFrame {
                 throw new RuntimeException(ex);
             }
 
+            if (file_selected.isSelected()){
+            JOptionPane.showMessageDialog(error_msg,
+                    "File "+file_for_encryption.getName()+" was encrypted, and saved to Desktop!",
+                    "Info message",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }else if(plaintext_selected.isSelected()){
+                JOptionPane.showMessageDialog(error_msg,
+                        "File "+file_for_encryption.getName()+" was created and encrypted, saved in project folder!",
+                        "Info message",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            return;
         });
 
         choose_plaintext_file.addActionListener(e -> {
