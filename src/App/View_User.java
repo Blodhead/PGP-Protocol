@@ -1,6 +1,7 @@
 
 package App;
 
+import Messaging.Encryption;
 import Messaging.KeyRings;
 import Messaging.User;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
@@ -72,6 +73,8 @@ public class View_User extends JFrame {
     private Vector<String> optionsToChoose;
     private JList<String> lista1;
     private JList<Object> lista2;
+    private JButton send;
+    private JTextField plaintext_field;
 
 
     private View_User() {
@@ -147,7 +150,7 @@ public class View_User extends JFrame {
             plaintext.setFont(new Font("Texas", Font.BOLD, 20));
             text_panel.add(plaintext);
 
-            JTextField plaintext_field = new JTextField();
+            plaintext_field = new JTextField();
             plaintext_field.setPreferredSize(new Dimension(750, 40));
             plaintext_field.setFont(new Font("Texas", Font.PLAIN, 12));
             text_panel.add(plaintext_field);
@@ -327,7 +330,7 @@ public class View_User extends JFrame {
         //////////////////////////////////SEND//////////////////////////////////////////////////
         {
             JPanel send_panel = new JPanel(new FlowLayout());
-            JButton send = new JButton("Send");
+            send = new JButton("Send");
             send.setPreferredSize(new Dimension(100, 40));
             send_panel.add(send);
             form.add(send_panel, BorderLayout.SOUTH);
@@ -733,17 +736,21 @@ public class View_User extends JFrame {
             else return;
 
             if((selected_list.getSelectedValue().toCharArray())[0] == '#'){
-                if(selected_list == public_JList)
-                    JOptionPane.showMessageDialog(error_msg,
-                            "Choose a valid user to export his public keys!",
-                            "Error message",
-                            JOptionPane.ERROR_MESSAGE);
-                else if(selected_list == private_Jlist)
+                if(selected_list == private_Jlist){
                     JOptionPane.showMessageDialog(error_msg,
                             "Choose user to export private key!",
                             "Error message",
                             JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }else if((selected_list.getSelectedValue().toCharArray())[0] != '#'){
+                /*if(selected_list == public_JList){
+                    JOptionPane.showMessageDialog(error_msg,
+                            "Choose a valid user to export his public keys!",
+                            "Error message",
+                            JOptionPane.ERROR_MESSAGE);
                 return;
+                }*/
             }
 
 
@@ -873,6 +880,32 @@ public class View_User extends JFrame {
                 return;
             }
             optionsToChoose.add(new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword())).toString());
+
+        });
+
+        send.addActionListener(e -> {
+
+            if(plaintext_field.getText().equals("")){
+                JOptionPane.showMessageDialog(error_msg,
+                        "Plaintext can't be empty!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                Encryption.signEncryptFile(plaintext_field.getText(),
+                        User.getPublicKey(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue()),
+                        User.getSecretKey(((JList<String>)private_key_pool1.getViewport().getView()).getSelectedValue()),
+                        pass.getPassword(),
+                        true,
+                        true,
+                        false,
+                        false,
+                        true);
+            } catch (Exception ex) {
+                System.out.println("GRESKAAA");
+                throw new RuntimeException(ex);
+            }
 
         });
 
