@@ -21,6 +21,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -75,7 +76,6 @@ public class View_User extends JFrame {
 
     private View_User() {
         super("Pretty Good Privacy protocol");
-
         //Setting up look and feel, in other words the theme of our App
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -129,6 +129,9 @@ public class View_User extends JFrame {
         p2.setLayout(new BorderLayout());
         p3.setLayout(new BorderLayout());
         p4.setLayout(new BorderLayout());
+
+        current_user = User.getUser("Milos");
+
     }
     private void fill_tab1(){
         //Message Sending
@@ -659,6 +662,22 @@ public class View_User extends JFrame {
     private void add_action_listeners(){
 
         generate_dsa.addActionListener( e -> {
+
+            if(!current_user.getUsername().equals(username.getText())) {
+                JOptionPane.showMessageDialog(error_msg,
+                        "This user can generate private keys only for him/her self!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if(username.getText().equals("") || mail.getText().equals("") ||pass_field.getPassword().length == 0){
+                JOptionPane.showMessageDialog(error_msg,
+                        "Parameters missing!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             try {
                 if(dsa_button.isSelected())

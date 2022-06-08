@@ -33,6 +33,7 @@ public class User {
 
     }
 
+    public String getUsername(){ return username;}
     public User(String username, String password, PGPPublicKeyRing pkr, PGPSecretKeyRing skr) {
         // ima samo DSA
 
