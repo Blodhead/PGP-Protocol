@@ -43,9 +43,6 @@ public class Encryption {
     {
 
         // Initialize Bouncy Castle security provider
-//        Provider provider = new BouncyCastleProvider();
-//        Security.addProvider(provider);
-
         OutputStream out = new FileOutputStream(fileName + ".pgp");
 
         if (radix64) {
@@ -54,7 +51,6 @@ public class Encryption {
 
         // ENCRYPT
         BcPGPDataEncryptorBuilder dataEncryptor;
-//        OutputStream encryptedOut = out;
         PGPEncryptedDataGenerator encryptedDataGenerator = null;
 
         if (encrypt) {
@@ -91,10 +87,12 @@ public class Encryption {
         }
 
         // COMPRESS
-        PGPCompressedDataGenerator compressedDataGenerator =
-                new PGPCompressedDataGenerator(compress ? PGPCompressedData.ZIP : PGPCompressedData.UNCOMPRESSED);
-        out = compressedDataGenerator.open(out, new byte [Encryption.BUFFER_SIZE]);
-
+        PGPCompressedDataGenerator compressedDataGenerator = null;
+        if(compress) {
+            compressedDataGenerator =
+                    new PGPCompressedDataGenerator(compress ? PGPCompressedData.ZIP : PGPCompressedData.UNCOMPRESSED);
+            out = compressedDataGenerator.open(out, new byte[Encryption.BUFFER_SIZE]);
+        }
         // SIGN
         PGPSignatureGenerator signatureGenerator = null;
 
@@ -140,7 +138,6 @@ public class Encryption {
                 fileName,
                 new Date(),
                 new byte [Encryption.BUFFER_SIZE] );
-
         // Main loop - read the "in" stream, compress, encrypt and write to the "out" stream
 
         // dohvatanje plain teksta
@@ -166,6 +163,7 @@ public class Encryption {
             compressedDataGenerator.close();
         if (encrypt)
             encryptedDataGenerator.close();
+        literalOut.close();
         out.close();
     }
 

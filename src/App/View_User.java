@@ -90,6 +90,8 @@ public class View_User extends JFrame {
     private JFileChooser file_deryptor;
     private JButton decrypt;
     private JPasswordField password_decrypt;
+    private JCheckBox zip;
+    private JCheckBox radix64;
 
     private View_User() {
         super("Pretty Good Privacy protocol");
@@ -342,9 +344,9 @@ public class View_User extends JFrame {
                 opt_additional.add(opt_additional_header, BorderLayout.NORTH);
 
                 JPanel opt_additional_body = new JPanel(new GridBagLayout());
-                JCheckBox zip = new JCheckBox("Zip compressions");
+                zip = new JCheckBox("Zip compressions");
                 zip.setFont(new Font("Texas", Font.ITALIC, 18));
-                JCheckBox radix64 = new JCheckBox("Radix64 conversion");
+                radix64 = new JCheckBox("Radix64 conversion");
                 System.out.println(radix64.getLocation());
                 radix64.setFont(new Font("Texas", Font.ITALIC, 18));
 
@@ -759,9 +761,13 @@ public class View_User extends JFrame {
             if(!opt_encryption_check.isSelected()){
                 encryption_algorithm.setEnabled(false);
                 public_key_pool1.setEnabled(false);
+                lista1.clearSelection();
+                lista1.setEnabled(false);
+
             }else{
                 encryption_algorithm.setEnabled(true);
                 public_key_pool1.setEnabled(true);
+                lista1.setEnabled(true);
             }
         });
 
@@ -769,9 +775,12 @@ public class View_User extends JFrame {
             if(!opt_authentication_check.isSelected()){
                 pass.setEnabled(false);
                 private_key_pool1.setEnabled(false);
+                lista2.clearSelection();
+                lista2.setEnabled(false);
             }else{
                 pass.setEnabled(true);
                 private_key_pool1.setEnabled(true);
+                lista2.setEnabled(true);
             }
         });
 
@@ -1017,6 +1026,7 @@ public class View_User extends JFrame {
                     return;
                     }
                 }
+
                 if(opt_authentication_check.isSelected()) {
                     if (((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue() == null) {
                         JOptionPane.showMessageDialog(error_msg,
@@ -1037,31 +1047,36 @@ public class View_User extends JFrame {
             }
             ////////////////////////////password///////////////////////
             {
-                if (pass.getPassword() == null) {
-                    JOptionPane.showMessageDialog(error_msg,
-                            "Must enter a password!!",
-                            "Error message",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if (!User.CheckPassword(current_user.getUsername(), String.valueOf(pass.getPassword()))) {
-                    JOptionPane.showMessageDialog(error_msg,
-                            "Must enter a valid password!!",
-                            "Error message",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
+                if(opt_authentication_check.isSelected()){
+                    if (pass.getPassword() == null) {
+                        JOptionPane.showMessageDialog(error_msg,
+                                "Must enter a password!!",
+                                "Error message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else if (!User.CheckPassword(current_user.getUsername(), String.valueOf(pass.getPassword()))) {
+                        JOptionPane.showMessageDialog(error_msg,
+                                "Must enter a valid password!!",
+                                "Error message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
             }
+
+            boolean is3DES = false;
+            if(encryption_algorithm.getSelectedItem() == "3DES") is3DES = true;
 
             try {
                 Encryption.signEncryptFile(file_for_encryption.getPath(),
                         User.getPublicKey(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue()),
                         User.getSecretKey(((JList<String>)private_key_pool1.getViewport().getView()).getSelectedValue()),
                         String.valueOf(pass.getPassword()).toCharArray(),
-                        true,
-                        true,
-                        false,
-                        false,
-                        true);
+                        opt_encryption_check.isSelected(),
+                        opt_authentication_check.isSelected(),
+                        zip.isSelected(),
+                        radix64.isSelected(),
+                        is3DES);
             } catch (Exception ex) {
                 System.out.println("GRESKAAA");
                 throw new RuntimeException(ex);

@@ -238,8 +238,6 @@ public class User {
     }
 
 
-
-
     public static Vector<String> getAllUsers() {
         Vector<String> vector = new Vector<>();
         vector.addAll(userMap.keySet());
