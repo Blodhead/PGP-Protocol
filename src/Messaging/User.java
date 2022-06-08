@@ -159,24 +159,85 @@ public class User {
     }
 
     public static void removePublicKey(String keyId) {
-        // uklanjanje kljuca iz mape
+
+        if (keyId.charAt(0) == '#')
+            removePublicSubKey(keyId);
+        else
+            removePublicKeyRing(keyId);
+
+
+    }
+
+    private static void removePublicKeyRing(String username) {
+
+        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(username);
+        publicKeyRingHashMap.remove(username);
+
+        boolean master = true;
+
+        for (Iterator<PGPPublicKey> pk = pkr.getPublicKeys(); pk.hasNext();) {
+            if (master) {
+                publicMap.remove(username);
+                pk.next();
+            }
+            else
+                publicMap.remove(getString(pk.next()));
+        }
+    }
+
+    private static void removePublicSubKey(String keyId) {
+        String username = mapKeyUser.get(keyId);
         PGPPublicKey pk = publicMap.get(keyId);
         publicMap.remove(keyId);
 
-
-        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(mapKeyUser.get(getString(pk)));
+        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(username);
         pkr = pkr.removePublicKey(pkr, pk);
-        publicKeyRingHashMap.replace(mapKeyUser.get(getString(pk)), pkr);
+        publicKeyRingHashMap.replace(username, pkr);
+
     }
+
 
     public static void removePrivateKey(String keyId) {
+
+        if (keyId.charAt(0) == '#')
+            removePrivateSubKey(keyId);
+        else
+            removePrivateKeyRing(keyId);
+
+    }
+
+    private static void removePrivateKeyRing(String username) {
+
+        PGPSecretKeyRing skr = secretKeyRingHashMap.get(username);
+        secretKeyRingHashMap.remove(username);
+
+        boolean master = true;
+
+        for (Iterator<PGPSecretKey> sk = skr.getSecretKeys(); sk.hasNext();) {
+            if (master) {
+                secretMap.remove(username);
+                sk.next();
+            }
+            else
+                secretMap.remove(getString(sk.next()));
+        }
+        getUser(username).secretKeyRing = null;
+    }
+
+    private static void removePrivateSubKey(String keyId) {
+        String username = mapKeyUser.get(keyId);
         PGPSecretKey sk = secretMap.get(keyId);
         secretMap.remove(keyId);
-        PGPSecretKeyRing skr = secretKeyRingHashMap.get(mapKeyUser.get(getString(sk)));
+
+        PGPSecretKeyRing skr = secretKeyRingHashMap.get(username);
         skr = skr.removeSecretKey(skr, sk);
-        secretKeyRingHashMap.replace(mapKeyUser.get(getString(sk)), skr);
-        userMap.get(sk.getUserIDs().next()).secretKeyRing = skr;
+        secretKeyRingHashMap.replace(username, skr);
+        userMap.get(username).secretKeyRing = skr;
+
     }
+
+
+
 
     public static Vector<String> getAllUsers() {
         Vector<String> vector = new Vector<>();
