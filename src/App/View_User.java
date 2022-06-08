@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.Vector;
 
 public class View_User extends JFrame {
@@ -654,6 +656,7 @@ public class View_User extends JFrame {
         show_panel.add(change_text);
 
         userChoice = new JComboBox<>(optionsToChoose);
+        userChoice.setMaximumRowCount(12);
         userChoice.setBounds(300,70,200,40);
         show_panel.add(userChoice);
 
@@ -725,6 +728,13 @@ public class View_User extends JFrame {
                 return;
             }
 
+            if (!User.CheckPassword(current_user.getUsername(), String.valueOf(pass_field.getPassword()))) {
+                JOptionPane.showMessageDialog(error_msg,
+                        "Must enter a valid password!!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             try {
                 if(dsa_button.isSelected())
                     KeyRings.generateNewUserKeyPair("DSA",username.getText(), String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
@@ -911,7 +921,7 @@ public class View_User extends JFrame {
         });
 
         plaintext_selected.addActionListener(e -> {
-            if(file_selected.isSelected() == false && plaintext_selected.isSelected() == true){
+            if(!file_selected.isSelected() && plaintext_selected.isSelected()){
                 file_selected.setSelected(false);
                 plaintext_field.setEnabled(true);
                 choose_plaintext_file.setEnabled(false);
@@ -920,21 +930,25 @@ public class View_User extends JFrame {
         });
 
         file_selected.addActionListener(e -> {
-            if(file_selected.isSelected() == true && plaintext_selected.isSelected() == false){
+            if(file_selected.isSelected() && !plaintext_selected.isSelected()){
                 plaintext_selected.setSelected(false);
                 plaintext_field.setEnabled(false);
                 choose_plaintext_file.setEnabled(true);
             }
         });
 
-        userChoice.addActionListener(e ->{
-
+        userChoice.addActionListener(e -> {
             current_user = User.getUser(String.valueOf(userChoice.getSelectedItem()));
 
+            View_User.private_list.removeAll(private_list);
+            View_User.private_list.addAll(User.getSecretKeys(current_user.getUsername()));
+
+            private_Jlist.setListData(private_list);
+            lista2.setListData(private_list);
         });
 
         registerUser.addActionListener(e -> {
-            if(reg_mail.getText() == "" || Arrays.toString(reg_pass.getPassword()) == "" || reg_username.getText() == ""){
+            if(Objects.equals(reg_mail.getText(), "") || String.valueOf(reg_pass.getPassword()).equals("") || Objects.equals(reg_username.getText(), "")){
                 JOptionPane.showMessageDialog(error_msg,
                         "All fields must be filled!",
                         "Error message",
@@ -948,17 +962,27 @@ public class View_User extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            User u = new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword()));
-            optionsToChoose.add(u.getUsername());
-            optionsToChoose = User.getAllUsers();
+
+            optionsToChoose.removeAll(User.getAllUsers());
+            User u = new User(reg_username.getText(),String.valueOf(reg_pass.getPassword()));
+
+            Vector<String> list = User.getAllUsers();
+            Iterator value = list.iterator();
+            while (value.hasNext()) {
+
+                optionsToChoose.add(String.valueOf(value.next()));
+            }
+
+
+
         });
 
         send.addActionListener(e -> {
             File file_for_encryption;
             /////////////////////FILE/PLAINTEXT///////////////////
             {
-                if ((plaintext_selected.isSelected() == true && plaintext_field.getText().equals("")) ||
-                        file_selected.isSelected() == true && plaintext_file == null) {
+                if ((plaintext_selected.isSelected() && plaintext_field.getText().equals("")) ||
+                        file_selected.isSelected() && plaintext_file == null) {
                     JOptionPane.showMessageDialog(error_msg,
                             "Must choose plaintext or file to encrypt!",
                             "Error message",
@@ -967,17 +991,17 @@ public class View_User extends JFrame {
                 }
 
                 file_for_encryption = new File("encrypted_file.txt");
-                if (plaintext_selected.isSelected() == true) {
-                    FileWriter myWriter = null;
+                if (plaintext_selected.isSelected()) {
+                    FileWriter myWriter;
                     try {
                         myWriter = new FileWriter(file_for_encryption);
-                        myWriter.write("Files in Java might be tricky, but it is fun enough!");
+                        myWriter.write(plaintext_field.getText());
                         myWriter.close();
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
-                if (file_selected.isSelected() == true) {
+                if (file_selected.isSelected()) {
                     file_for_encryption = plaintext_file;
                 }
 
