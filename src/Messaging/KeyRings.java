@@ -2,16 +2,23 @@ package Messaging;
 
 import App.View_User;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.KeyGenerationParameters;
+import org.bouncycastle.crypto.generators.ElGamalKeyPairGenerator;
+import org.bouncycastle.crypto.params.ElGamalKeyGenerationParameters;
+import org.bouncycastle.crypto.params.ElGamalParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
+import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
 import org.bouncycastle.openpgp.operator.jcajce.*;
 
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.*;
 import javax.crypto.Cipher;
 import java.security.*;
@@ -161,10 +168,38 @@ public class KeyRings {
 
 
 
-
 //                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
+                PGPKeyPair kp = null;
+                if(size != 4096)
+                kp = generateNewKeyPair(algo, size, password);
 
-                PGPKeyPair kp = generateNewKeyPair(algo, size, password);
+                if(size == 4096) {// ne radi
+
+                    /*FIRST TRY
+                    ElGamalKeyPairGenerator elGamalKeyPairGenerator = new ElGamalKeyPairGenerator();
+                    elGamalKeyPairGenerator.init(new KeyGenerationParameters(new SecureRandom(), 4096));
+                    AsymmetricCipherKeyPair elgKp = elGamalKeyPairGenerator.generateKeyPair();
+                    kp = new BcPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
+                    */
+
+                    /*SECOND TRY
+                    BigInteger maxLimit = new BigInteger("5000000000000");
+                    BigInteger minLimit = new BigInteger("25000000000");
+
+                    BigInteger bigInteger1 = maxLimit.subtract(minLimit);
+                    Random randNum1 = new Random();
+                    int len1 = maxLimit.bitLength();
+
+                    BigInteger bigInteger2 = maxLimit.subtract(minLimit);
+                    Random randNum2 = new Random();
+                    int len2 = maxLimit.bitLength();
+
+                    ElGamalKeyPairGenerator elGamalKeyPairGenerator = new ElGamalKeyPairGenerator();
+                    elGamalKeyPairGenerator.init(new ElGamalKeyGenerationParameters(new SecureRandom(), new ElGamalParameters(bigInteger1,bigInteger2,4096)));
+                    AsymmetricCipherKeyPair elgKp = elGamalKeyPairGenerator.generateKeyPair();
+                    kp = new BcPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());*/
+                    return "";
+                }
 
                 PGPKeyRingGenerator krg = generatorHashMap.get(username);
 

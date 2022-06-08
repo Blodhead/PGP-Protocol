@@ -879,8 +879,9 @@ public class View_User extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            optionsToChoose.add(new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword())).toString());
-
+            User u = new User(reg_username.getText(),Arrays.toString(reg_pass.getPassword()));
+            optionsToChoose.add(u.getUsername());
+            optionsToChoose = User.getAllUsers();
         });
 
         send.addActionListener(e -> {
