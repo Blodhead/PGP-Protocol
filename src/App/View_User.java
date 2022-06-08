@@ -1013,7 +1013,7 @@ public class View_User extends JFrame {
                 Encryption.signEncryptFile(file_for_encryption.getPath(),
                         User.getPublicKey(((JList<String>)public_key_pool1.getViewport().getView()).getSelectedValue()),
                         User.getSecretKey(((JList<String>)private_key_pool1.getViewport().getView()).getSelectedValue()),
-                        pass.getPassword(),
+                        String.valueOf(pass.getPassword()).toCharArray(),
                         true,
                         true,
                         false,

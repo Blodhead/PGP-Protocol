@@ -3,6 +3,7 @@ package Messaging;
 import org.bouncycastle.openpgp.*;
 
 import javax.crypto.SecretKey;
+import javax.jws.soap.SOAPBinding;
 import javax.net.ssl.SSLEngineResult;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -256,6 +257,18 @@ public class User {
 
     public static PGPSecretKey getSecretKey(String keyId) {
         return secretMap.get(keyId);
+    }
+
+    public static PGPPublicKey getPublicKeyDSA(long keyId) {
+        for (PGPPublicKey pk: publicMap.values()) {
+            if (pk.getKeyID() == keyId)
+                return pk;
+        }
+        return null;
+    }
+
+    public static boolean CheckPassword(String username, String password) {
+        return (getUser(username).password.equals(password));
     }
     
 
