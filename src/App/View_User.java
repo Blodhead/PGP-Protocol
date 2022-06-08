@@ -143,15 +143,18 @@ public class View_User extends JFrame {
 
         //////////////////////////////////PLAINTEXT////////////////////////////////////////////
         {
-            JPanel text_panel = new JPanel(new FlowLayout());
+            JPanel text_panel = new JPanel(null);
+            text_panel.setPreferredSize(new Dimension(500,50));
             text_panel.setBorder(new TitledBorder(""));
 
             JLabel plaintext = new JLabel("Enter plaintext:");
+            plaintext.setBounds(10,10,100,30);
             plaintext.setFont(new Font("Texas", Font.BOLD, 20));
             text_panel.add(plaintext);
 
             plaintext_field = new JTextField();
-            plaintext_field.setPreferredSize(new Dimension(750, 40));
+            ///plaintext_field.setPreferredSize(new Dimension(750, 40));
+            plaintext_field.setBounds(150,10,100,30);
             plaintext_field.setFont(new Font("Texas", Font.PLAIN, 12));
             text_panel.add(plaintext_field);
 
@@ -730,6 +733,7 @@ public class View_User extends JFrame {
         exp_button.addActionListener(ae -> {
 
             JFileChooser chooser;
+            //chooser.setCurrentDirectory(File dir);
 
             if(selected_list != null)
                 chooser = new JFileChooser();
@@ -742,15 +746,13 @@ public class View_User extends JFrame {
                             "Error message",
                             JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-            }else if((selected_list.getSelectedValue().toCharArray())[0] != '#'){
-                /*if(selected_list == public_JList){
+                }else if(selected_list == public_JList) {
                     JOptionPane.showMessageDialog(error_msg,
                             "Choose a valid user to export his public keys!",
                             "Error message",
                             JOptionPane.ERROR_MESSAGE);
+                }
                 return;
-                }*/
             }
 
 
