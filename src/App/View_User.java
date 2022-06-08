@@ -75,6 +75,9 @@ public class View_User extends JFrame {
     private JList<Object> lista2;
     private JButton send;
     private JTextField plaintext_field;
+    private JFileChooser plaintext_file;
+    private JLabel plaintext_file_label;
+    private JButton choose_plaintext_file;
 
 
     private View_User() {
@@ -144,20 +147,37 @@ public class View_User extends JFrame {
         //////////////////////////////////PLAINTEXT////////////////////////////////////////////
         {
             JPanel text_panel = new JPanel(null);
-            text_panel.setPreferredSize(new Dimension(500,50));
+            text_panel.setPreferredSize(new Dimension(500,70));
             text_panel.setBorder(new TitledBorder(""));
 
             JLabel plaintext = new JLabel("Enter plaintext:");
-            plaintext.setBounds(10,10,100,30);
+            plaintext.setBounds(60,18,200,30);
             plaintext.setFont(new Font("Texas", Font.BOLD, 20));
             text_panel.add(plaintext);
 
             plaintext_field = new JTextField();
-            ///plaintext_field.setPreferredSize(new Dimension(750, 40));
-            plaintext_field.setBounds(150,10,100,30);
+            plaintext_field.setBounds(220,15,480,40);
             plaintext_field.setFont(new Font("Texas", Font.PLAIN, 12));
             text_panel.add(plaintext_field);
 
+            JLabel or = new JLabel("OR");
+            or.setBounds(740,18, 30,30);
+            or.setFont(new Font("Texas", Font.BOLD, 20));
+            text_panel.add(or);
+
+            JLabel choose_a_file = new JLabel("Choose a file: ");
+            choose_a_file.setFont(new Font("Texas", Font.BOLD, 20));
+            choose_a_file.setBounds(830,18,140,30);
+            text_panel.add(choose_a_file);
+
+            choose_plaintext_file = new JButton("Choose...");
+            choose_plaintext_file.setBounds(980,18, 90,30);
+            text_panel.add(choose_plaintext_file);
+
+            plaintext_file_label = new JLabel("))");
+            plaintext_file_label.setBounds(1080,20,100,30);
+            text_panel.add(plaintext_file_label);
+////////////////////lsaiugdwigfowhfgohqwieg////////////////
             form.add(text_panel, BorderLayout.NORTH);
         }
         //////////////////////////////////OPTIONS///////////////////////////////////////////////
@@ -736,7 +756,7 @@ public class View_User extends JFrame {
             //chooser.setCurrentDirectory(File dir);
 
             if(selected_list != null)
-                chooser = new JFileChooser();
+                chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             else return;
 
             if((selected_list.getSelectedValue().toCharArray())[0] == '#'){
@@ -796,7 +816,7 @@ public class View_User extends JFrame {
         });
 
         imp_key_button.addActionListener(ae -> {
-            JFileChooser chooser = new JFileChooser();
+            JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             File fileToLoad;
             FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
             chooser.setFileFilter(filter);
@@ -832,7 +852,17 @@ public class View_User extends JFrame {
             }else if(selected_list == private_Jlist){
                 User.removePrivateKey(selected_list.getSelectedValue());//#keyId
             }
+            View_User.private_list.removeAll(private_list);
+            View_User.private_list.addAll(User.getSecretKeys(username.getText()));
 
+            private_Jlist.setListData(private_list);
+            lista2.setListData(private_list);
+
+            View_User.public_list.removeAll(public_list);
+            View_User.public_list.addAll(User.getPublicKeys());
+
+            public_JList.setListData(public_list);
+            lista1.setListData(public_list);
         });
 
         private_Jlist.addListSelectionListener(e -> {
