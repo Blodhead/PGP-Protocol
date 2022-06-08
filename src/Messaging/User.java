@@ -257,6 +257,14 @@ public class User {
     public static PGPSecretKey getSecretKey(String keyId) {
         return secretMap.get(keyId);
     }
+
+    public static PGPPublicKey getPublicKeyDSA(long keyId) {
+        for (PGPPublicKey pk: publicMap.values()) {
+            if (pk.getKeyID() == keyId)
+                return pk;
+        }
+        return null;
+    }
     
 
 }
