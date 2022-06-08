@@ -1001,35 +1001,38 @@ public class View_User extends JFrame {
                 }
 
                 ///////////////////////////keys////////////////////////
-                if (((JList<String>) public_key_pool1.getViewport().getView()).getSelectedValue() == null) {
-                    JOptionPane.showMessageDialog(error_msg,
-                            "Must choose a public key!!",
-                            "Error message",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue() == null) {
-                    JOptionPane.showMessageDialog(error_msg,
-                            "Must choose a private key!!",
-                            "Error message",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (((((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue())).charAt(0) == '#') {
-                    JOptionPane.showMessageDialog(error_msg,
-                            "Choose a private dsa key!!",
-                            "Error message",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (((((JList<String>) public_key_pool1.getViewport().getView()).getSelectedValue())).charAt(0) != '#') {
+                if(opt_encryption_check.isSelected()){
+                    if (((JList<String>) public_key_pool1.getViewport().getView()).getSelectedValue() == null) {
+                        JOptionPane.showMessageDialog(error_msg,
+                                "Must choose a public key!!",
+                                "Error message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (((((JList<String>) public_key_pool1.getViewport().getView()).getSelectedValue())).charAt(0) != '#') {
                     JOptionPane.showMessageDialog(error_msg,
                             "Choose a public dsa key!!",
                             "Error message",
                             JOptionPane.ERROR_MESSAGE);
                     return;
+                    }
+                }
+                if(opt_authentication_check.isSelected()) {
+                    if (((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue() == null) {
+                        JOptionPane.showMessageDialog(error_msg,
+                                "Must choose a private key!!",
+                                "Error message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (((((JList<String>) private_key_pool1.getViewport().getView()).getSelectedValue())).charAt(0) == '#') {
+                        JOptionPane.showMessageDialog(error_msg,
+                                "Choose a private dsa key!!",
+                                "Error message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
             }
             ////////////////////////////password///////////////////////
