@@ -131,7 +131,7 @@ public class KeyRings {
 
             PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
 
-            if (!privateKeyRingCollection.getKeyRings(username).hasNext() ) { // dohvata userov generator
+            if (generatorHashMap.get(username) == null ) { // dohvata userov generator
 
                 PGPKeyRingGenerator keyRingGen = new PGPKeyRingGenerator(
                         PGPSignature.POSITIVE_CERTIFICATION,
@@ -183,6 +183,8 @@ public class KeyRings {
                     */
 
                     /*SECOND TRY
+                                    BigInteger bi2 = BigInteger.probablePrime(16, new Random());
+
                     BigInteger maxLimit = new BigInteger("5000000000000");
                     BigInteger minLimit = new BigInteger("25000000000");
 
@@ -263,5 +265,7 @@ public class KeyRings {
     public static PGPPublicKey getPublicKeyByID(long _id) throws PGPException {
         return publicKeyRingCollection.getPublicKey(_id);
     }
+
+
 
 }

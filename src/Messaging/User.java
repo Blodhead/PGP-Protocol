@@ -3,6 +3,7 @@ package Messaging;
 import org.bouncycastle.openpgp.*;
 
 import javax.crypto.SecretKey;
+import javax.net.ssl.SSLEngineResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +24,8 @@ public class User {
 //    private static Vector<PGPPublicKeyRing> publicKeyRings = new Vector<>();
     private static HashMap<String, PGPPublicKey> publicMap = new HashMap<>();
     private static HashMap<String, PGPPublicKeyRing> publicKeyRingHashMap = new HashMap<>();
+
+    private static HashMap<String, String> mapKeyUser = new HashMap<>();
 
 
     public User(String username, String password) {
@@ -122,6 +125,7 @@ public class User {
 //        publicKeyRings.addElement(pkr);
         publicMap.put(username, pkr.getPublicKey());
         publicKeyRingHashMap.put(username, pkr);
+        mapKeyUser.put(username, username);
     }
 
     public static void addPublicSubKey(String username, PGPPublicKeyRing pkr, PGPPublicKey pk) {
@@ -130,6 +134,7 @@ public class User {
 //        publicKeyRings.addElement();
 
         publicKeyRingHashMap.replace(username, pkr);
+        mapKeyUser.put(getString(pk), username);
     }
 
     // mora da se napravi i kad ima subkey-eve da radi
@@ -139,6 +144,8 @@ public class User {
         secretMap.put(username, skr.getSecretKey());
         secretKeyRingHashMap.put(username, skr);
 
+        mapKeyUser.put(username, username);
+
     }
 
     public static void addSecretSubKey(String username, PGPSecretKeyRing skr, PGPSecretKey sk) {
@@ -146,6 +153,9 @@ public class User {
         User user = userMap.get(username);
         user.secretKeyRing = skr;
         secretKeyRingHashMap.replace(username, skr);
+
+        mapKeyUser.put(getString(sk), username);
+
     }
 
     public static void removePublicKey(String keyId) {
@@ -153,18 +163,18 @@ public class User {
         PGPPublicKey pk = publicMap.get(keyId);
         publicMap.remove(keyId);
 
-        //
-        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(pk.getUserIDs().next());
+
+        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(mapKeyUser.get(getString(pk)));
         pkr = pkr.removePublicKey(pkr, pk);
-        publicKeyRingHashMap.replace(pk.getUserIDs().next(), pkr);
+        publicKeyRingHashMap.replace(mapKeyUser.get(getString(pk)), pkr);
     }
 
     public static void removePrivateKey(String keyId) {
         PGPSecretKey sk = secretMap.get(keyId);
         secretMap.remove(keyId);
-        PGPSecretKeyRing skr = secretKeyRingHashMap.get(sk.getUserIDs().next());
+        PGPSecretKeyRing skr = secretKeyRingHashMap.get(mapKeyUser.get(getString(sk)));
         skr = skr.removeSecretKey(skr, sk);
-        secretKeyRingHashMap.replace(sk.getUserIDs().next(), skr);
+        secretKeyRingHashMap.replace(mapKeyUser.get(getString(sk)), skr);
         userMap.get(sk.getUserIDs().next()).secretKeyRing = skr;
     }
 
