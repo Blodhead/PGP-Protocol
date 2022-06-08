@@ -197,7 +197,8 @@ public class KeyRings {
                     ElGamalKeyPairGenerator elGamalKeyPairGenerator = new ElGamalKeyPairGenerator();
                     elGamalKeyPairGenerator.init(new ElGamalKeyGenerationParameters(new SecureRandom(), new ElGamalParameters(bigInteger1,bigInteger2,4096)));
                     AsymmetricCipherKeyPair elgKp = elGamalKeyPairGenerator.generateKeyPair();
-                    kp = new BcPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());*/
+                    kp = new BcPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
+                    */
                     return "";
                 }
 
