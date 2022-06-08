@@ -1,10 +1,12 @@
 
 package App;
 
+import Messaging.Decryption;
 import Messaging.Encryption;
 import Messaging.KeyRings;
 import Messaging.User;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
@@ -23,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
@@ -84,6 +87,9 @@ public class View_User extends JFrame {
 
     private JCheckBox plaintext_selected;
     private JCheckBox file_selected;
+    private JFileChooser file_deryptor;
+    private JButton decrypt;
+    private JPasswordField password_decrypt;
 
     private View_User() {
         super("Pretty Good Privacy protocol");
@@ -388,7 +394,6 @@ public class View_User extends JFrame {
 
         JPanel form = new JPanel(new BorderLayout(2,2));
 
-
         JPanel fields = new JPanel(new GridLayout(0,2,1,1));
         fields.setBorder(new TitledBorder(""));
 
@@ -397,37 +402,27 @@ public class View_User extends JFrame {
         insert_text.setBorder(new EmptyBorder(10,0,0,0));
         form.add(insert_text,BorderLayout.NORTH);
 
-        JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-        form.add(j,BorderLayout.CENTER);
+        file_deryptor = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        form.add(file_deryptor,BorderLayout.CENTER);
 
         JPanel labelFields = new JPanel(null);
         labelFields.setBorder(new TitledBorder(""));
-        labelFields.setPreferredSize(new Dimension(800,180));
+        labelFields.setPreferredSize(new Dimension(800,120));
 
-        JLabel ciphertext_label = new JLabel("Ciphertext: ");
+        JLabel ciphertext_label = new JLabel("Password: ");
         ciphertext_label.setFont(new Font("Texas",Font.ITALIC,18));
-        ciphertext_label.setBounds(300,30,100,20);
+        ciphertext_label.setBounds(440,32,100,20);
 
-        JLabel plaintext_label = new JLabel("Plaintext: ");
-        plaintext_label.setFont(new Font("Texas",Font.ITALIC,18));
-        plaintext_label.setBounds(300,110,100,20);
+        password_decrypt = new JPasswordField();
+        password_decrypt.setBounds(545,30,200,30);
 
-        JTextField ciphertext = new JTextField();
-        ciphertext.setBounds(400,30,500,30);
-        JTextField plaintext = new JTextField();
-        plaintext.setBounds(400,110,500,30);
-
-
-        JButton decrypt = new JButton("Receive");
+        decrypt = new JButton("Receive");
         decrypt.setBounds(560,70,100,30);
         labelFields.add(decrypt);
 
-        ///        showMessageDialog(null, "This is even shorter");
-
         labelFields.add(ciphertext_label);
-        labelFields.add(plaintext_label);
-        labelFields.add(ciphertext);
-        labelFields.add(plaintext);
+
+        labelFields.add(password_decrypt);
 
         form.add(labelFields, BorderLayout.SOUTH);
 
@@ -1093,6 +1088,44 @@ public class View_User extends JFrame {
                 plaintext_file_label.setFont(new Font("Texas",Font.ITALIC,18));
                 plaintext_file_label.setVisible(true);
             }
+        });
+
+        decrypt.addActionListener(e -> {
+
+            if (!User.CheckPassword(current_user.getUsername(), String.valueOf(password_decrypt.getPassword()))) {
+                JOptionPane.showMessageDialog(error_msg,
+                        "Must enter a valid password!!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if(!file_deryptor.getSelectedFile().getName().contains(".gpg")){
+                JOptionPane.showMessageDialog(error_msg,
+                        "File must be .gpg type!",
+                        "Error message",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                Decryption.decryptAndVerify(file_deryptor.getSelectedFile().getName(),String.valueOf(password_decrypt.getPassword()).toCharArray());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (PGPException ex) {
+                throw new RuntimeException(ex);
+            } catch (SignatureException ex) {
+                throw new RuntimeException(ex);
+            }
+
+
+            JOptionPane.showMessageDialog(error_msg,
+                    "File has been decrypted!",
+                    "Error message",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+
+
         });
     }
 
