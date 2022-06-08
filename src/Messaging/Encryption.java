@@ -7,6 +7,8 @@ import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
 import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder;
 import org.bouncycastle.openpgp.operator.bc.*;
+import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.util.io.Streams;
 
 import java.io.*;
@@ -44,15 +46,41 @@ public class Encryption {
 
         // Initialize Bouncy Castle security provider
         OutputStream out = new FileOutputStream(fileName + ".pgp");
-
+        FileInputStream in = new FileInputStream(fileName);
         if (radix64) {
             out = new ArmoredOutputStream(out);
         }
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+
+        PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
+                PGPCompressedData.ZIP);
+
+        org.bouncycastle.openpgp.PGPUtil.writeFileToLiteralData(comData.open(bOut),
+                PGPLiteralData.BINARY, new File(fileName));
+        comData.close();
+
+        JcePGPDataEncryptorBuilder c = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5).setWithIntegrityPacket(sign).setSecureRandom(new SecureRandom()).setProvider("BC");
+
+        PGPEncryptedDataGenerator cPk = new PGPEncryptedDataGenerator(c);
+
+        JcePublicKeyKeyEncryptionMethodGenerator d = new JcePublicKeyKeyEncryptionMethodGenerator(publicKey).setProvider(new BouncyCastleProvider()).setSecureRandom(new SecureRandom());
+
+        cPk.addMethod(d);
+
+        byte[] bytes = bOut.toByteArray();
+
+        OutputStream cOut = cPk.open(out, bytes.length);
+
+        cOut.write(bytes);
+
+        cOut.close();
+
+
 
         // ENCRYPT
-        BcPGPDataEncryptorBuilder dataEncryptor;
-        PGPEncryptedDataGenerator encryptedDataGenerator = null;
-
+        /*BcPGPDataEncryptorBuilder dataEncryptor;
+        PGPEncryptedDataGenerator encryptedDataGenerator = null;*/
+/*
         if (encrypt) {
 
             // biranje algoritma
@@ -95,7 +123,6 @@ public class Encryption {
         }
         // SIGN
         PGPSignatureGenerator signatureGenerator = null;
-
         if (sign) {
 
             // da li je DSA kljuc
@@ -131,7 +158,7 @@ public class Encryption {
         }
 
         // Pravljenje header-a
-        PGPLiteralDataGenerator headerDataGenerator = new PGPLiteralDataGenerator();
+        /*PGPLiteralDataGenerator headerDataGenerator = new PGPLiteralDataGenerator();
         OutputStream literalOut = headerDataGenerator.open(
                 out,
                 PGPLiteralData.BINARY,
@@ -141,7 +168,7 @@ public class Encryption {
         // Main loop - read the "in" stream, compress, encrypt and write to the "out" stream
 
         // dohvatanje plain teksta
-        FileInputStream in = new FileInputStream(fileName);
+
         byte[] buf = new byte[Encryption.BUFFER_SIZE];
         int len;
 
@@ -154,16 +181,18 @@ public class Encryption {
                 signatureGenerator.update(buf, 0, len);
         }
 
-        in.close();
+
         headerDataGenerator.close();
         // Generate the signature, compress, encrypt and write to the "out" stream
+
         if (sign)
             signatureGenerator.generate().encode(out);
         if (compress)
-            compressedDataGenerator.close();
-        if (encrypt)
-            encryptedDataGenerator.close();
-        literalOut.close();
+            compressedDataGenerator.close();*/
+        /*if (encrypt)
+            encryptedDataGenerator.close();*/
+        //literalOut.close();
+        in.close();
         out.close();
     }
 
