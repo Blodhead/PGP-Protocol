@@ -178,12 +178,12 @@ public class KeyRings {
 
 
 
-////                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
-//                PGPKeyPair kp = null;
-//                if(size != 4096)
-//                kp = generateNewKeyPair(algo, size, password);
-//
-//                if(size == 4096) {// ne radi
+//                PGPSecretKeyRing privateKR = privateKeyRingCollection.getKeyRings(username).next();
+                PGPKeyPair kp = null;
+                if(size != 4096)
+                kp = generateNewKeyPair(algo, size, password);
+
+                if(size == 4096) {// ne radi
 ////
 ////                    KeyPairGenerator    elgKpg = KeyPairGenerator.getInstance("ELGAMAL", "BC");
 //                    BigInteger          g = new BigInteger("153d5d6172adb43045b68ae8e1de1070b6137005686d29d3d73a7749199681ee5b212c9b96bfdcfa5b20cd5e3fd2044895d609cf9b410b7a0f12ca1cb9a428cc", 16);
