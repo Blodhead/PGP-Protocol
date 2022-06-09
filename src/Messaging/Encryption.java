@@ -65,18 +65,21 @@ public class Encryption {
         //PGPKeyEncryptionMethodGenerator method_gen = new JcePBEKeyEncryptionMethodGenerator(password).setProvider("BC");
         //encryptedDataGenerator.addMethod(method_gen);
 
-        JcePublicKeyKeyEncryptionMethodGenerator d = new JcePublicKeyKeyEncryptionMethodGenerator(publicKey).setProvider("BC").setSecureRandom(new SecureRandom());
+        if(encrypt) {
+            JcePublicKeyKeyEncryptionMethodGenerator d = new JcePublicKeyKeyEncryptionMethodGenerator(publicKey).setProvider("BC").setSecureRandom(new SecureRandom());
 
-        encryptedDataGenerator.addMethod(d);
-
+            encryptedDataGenerator.addMethod(d);
+        }
         OutputStream compressedOut = encryptedDataGenerator.open(out, new byte[BUFFER_SIZE]);
 
         // Inicijalizacija generatora za kompresiju
-        PGPCompressedDataGenerator compressedDataGenerator = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
+
 
         //ZIP
-        if (compress)
+        PGPCompressedDataGenerator compressedDataGenerator = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
+        if (compress) {
             compressedOut = compressedDataGenerator.open(compressedOut);
+        }
 
         PGPSignatureGenerator signatureGenerator = null;
         // Ako imamo kljuc za potpis:
@@ -122,7 +125,6 @@ public class Encryption {
             signatureGenerator.generate().encode(compressedOut);
 
         compressedOut.close();
-        compressedDataGenerator.close();
         encryptedDataGenerator.close();
         inputFileStream.close();
         out.close();
