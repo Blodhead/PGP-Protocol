@@ -164,6 +164,9 @@ public class KeyRings {
         }
         else if (algo.equals("ElGamal")) {
 
+            if (generatorHashMap.get(username) == null)
+                return "";
+
             try {
 
 
