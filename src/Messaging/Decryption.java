@@ -29,11 +29,11 @@ public class Decryption {
             File filename,
             char[] passphrase)
             throws IOException, PGPException, SignatureException {
-//        PGPSecretKeyRingCollection secretKeyCollection = new PGPSecretKeyRingCollection(Menu.privateKeyRingTableModel.getPrivateKeys());
-//        PGPPublicKeyRingCollection publicKeyCollection = new PGPPublicKeyRingCollection(Menu.publicKeyRingTableModel.getPublicKeys());
+
+        int index = filename.getName().indexOf( ".pgp");
 
         InputStream in = new FileInputStream(filename);
-        OutputStream out = new FileOutputStream("");
+        OutputStream out = new FileOutputStream(""+filename.getName().substring(0,index));
         InputStream keyIn = null;
 
         Security.addProvider(new BouncyCastleProvider());
