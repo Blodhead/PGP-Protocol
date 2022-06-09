@@ -865,6 +865,8 @@ public class View_User extends JFrame {
                     fileToLoad = chooser.getSelectedFile();
                     if(fileToLoad.getName().contains("private.asc") || fileToLoad.getName().contains("public.asc")){
 
+                        // da li je ispravan user
+
                         //CURRENT_USER ne bi trebao da moze da doda privatne kljuceve vlasnika fjla
                         /*if(fileToLoad.getName().contains("private.asc")){
                             JOptionPane.showMessageDialog(error_msg,
@@ -879,7 +881,12 @@ public class View_User extends JFrame {
                         try {
                             FileInputStream fis = new FileInputStream(fileToLoad);
 
-                            KeyRings.importKeyRing(fis);
+                            if (!KeyRings.importKeyRing(String.valueOf(userChoice.getSelectedItem()), fis)) {
+                                JOptionPane.showMessageDialog(error_msg,
+                                        "Choose your own private key ring!",
+                                        "Error message",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
 
                         } catch (Exception e) {
                             e.printStackTrace();

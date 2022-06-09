@@ -138,7 +138,7 @@ public class User {
 
         for (Iterator<PGPPublicKey> keyIter = pkr.getPublicKeys(); keyIter.hasNext();) {
             PGPPublicKey pk = keyIter.next();
-            publicMap.put(getString(pk), pkr.getPublicKey());
+            publicMap.put(getString(pk), pk);
             mapKeyUser.put(getString(pk), username);
         }
 
@@ -160,7 +160,7 @@ public class User {
 
         for (Iterator<PGPSecretKey> keyIt = skr.getSecretKeys(); keyIt.hasNext();) {
             PGPSecretKey key = keyIt.next();
-            secretMap.put(getString(key), skr.getSecretKey());
+            secretMap.put(getString(key), key);
             mapKeyUser.put(getString(key), username);
         }
 

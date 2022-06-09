@@ -276,7 +276,7 @@ public class KeyRings {
     }
 
 
-    public static void importKeyRing(InputStream in) {
+    public static boolean importKeyRing(String username_, InputStream in) {
 
         try {
             BcPGPObjectFactory factory = new BcPGPObjectFactory(PGPUtil.getDecoderStream(in));
@@ -293,16 +293,22 @@ public class KeyRings {
 
             } else if (o instanceof PGPSecretKeyRing) {
 
+                // da li je dobar user?
+
                 PGPSecretKeyRing skr = (PGPSecretKeyRing) o;
 
                 String username = skr.getSecretKey().getUserIDs().next();
 
-                User.addSecretKeyRing(username, skr);
+                if (username.equals(username_))
+                    User.addSecretKeyRing(username, skr);
+                else
+                    return false;
 
             }
 
         } catch (Exception e) {}
 
+        return true;
     }
 
 
