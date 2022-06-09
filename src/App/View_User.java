@@ -866,13 +866,13 @@ public class View_User extends JFrame {
                     if(fileToLoad.getName().contains("private.asc") || fileToLoad.getName().contains("public.asc")){
 
                         //CURRENT_USER ne bi trebao da moze da doda privatne kljuceve vlasnika fjla
-                        if(fileToLoad.getName().contains("private.asc")){
+                        /*if(fileToLoad.getName().contains("private.asc")){
                             JOptionPane.showMessageDialog(error_msg,
                                     "You can import only your private keys!",
                                     "Error message",
                                     JOptionPane.ERROR_MESSAGE);
                             return;
-                        }
+                        }*/
 
                         good_choice = true;
 
