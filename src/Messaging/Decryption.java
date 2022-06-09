@@ -39,7 +39,6 @@ public class Decryption {
         Security.addProvider(new BouncyCastleProvider());
 
         in = org.bouncycastle.openpgp.PGPUtil.getDecoderStream(in);
-        in = PGPUtil.getDecoderStream(in);
         PGPObjectFactory pgpF = new PGPObjectFactory(in, null);
         PGPEncryptedDataList encryptedDataList;
 
@@ -59,13 +58,15 @@ public class Decryption {
         PGPPublicKeyEncryptedData pbe = null;
 
         while (sKey == null && it.hasNext()) {
-            pbe = (PGPPublicKeyEncryptedData)it.next();
+            Object temp = it.next();
+            pbe = (PGPPublicKeyEncryptedData)temp;
             //sKey = findSecretKey(keyIn, pbe.getKeyID(), passphrase);
+            sKey = Encryption.findPrivateKey(User.getSecretKey("#"+ String.valueOf(pbe.getKeyID())),passphrase);
         }
 
-        if (sKey == null) {
+        /*if (sKey == null) {
             throw new IllegalArgumentException("Secret key for message not found.");
-        }
+        }*/
 
         PublicKeyDataDecryptorFactory b = new JcePublicKeyDataDecryptorFactoryBuilder().setProvider("BC").setContentProvider("BC").build(sKey);
 
@@ -75,11 +76,17 @@ public class Decryption {
 
         Object message = plainFact.nextObject();
 
+        PGPObjectFactory pgpFact;
+
         if (message instanceof  PGPCompressedData) {
             PGPCompressedData cData = (PGPCompressedData) message;
-            PGPObjectFactory pgpFact = new PGPObjectFactory(cData.getDataStream(), null);
-
+            //unizip
+            pgpFact = new PGPObjectFactory(cData.getDataStream(), null);
             message = pgpFact.nextObject();
+        }
+
+        if (message instanceof  PGPOnePassSignatureList){
+            //message = pgpFact.nextObject();
         }
 
         if (message instanceof  PGPLiteralData) {
@@ -89,10 +96,6 @@ public class Decryption {
             while ((ch = unc.read()) >= 0) {
                 out.write(ch);
             }
-        } else if (message instanceof  PGPOnePassSignatureList) {
-            throw new PGPException("Encrypted message contains a signed message - not literal data.");
-        } else {
-            throw new PGPException("Message is not a simple encrypted file - type unknown.");
         }
 
         if (pbe.isIntegrityProtected()) {
