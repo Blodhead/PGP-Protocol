@@ -1160,16 +1160,16 @@ public class View_User extends JFrame {
                 return;
             }
 
-            if(!file_deryptor.getSelectedFile().getName().contains(".gpg")){
+            if(!file_deryptor.getSelectedFile().getName().contains(".pgp")){
                 JOptionPane.showMessageDialog(error_msg,
-                        "File must be .gpg type!",
+                        "File must be .pgp type!",
                         "Error message",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             try {
-                Decryption.decryptAndVerify(file_deryptor.getSelectedFile().getName(),String.valueOf(password_decrypt.getPassword()).toCharArray());
+                Decryption.decryptAndVerify(file_deryptor.getSelectedFile(),String.valueOf(password_decrypt.getPassword()).toCharArray());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             } catch (PGPException ex) {

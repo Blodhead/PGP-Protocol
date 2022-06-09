@@ -54,7 +54,7 @@ public class User {
         publicKeyRingHashMap.put(username, pkr);
     }
 
-    private static String getString(PGPSecretKey sk) { // ElGamal
+    public static String getString(PGPSecretKey sk) { // ElGamal
 
         if (sk.isMasterKey())
             return sk.getUserIDs().next();
@@ -62,7 +62,7 @@ public class User {
         return "#" + sk.getKeyID();
     }
 
-    private static String getString(PGPPublicKey pk) {
+    public static String getString(PGPPublicKey pk) {
 
         if (pk.isMasterKey())
             return pk.getUserIDs().next();
