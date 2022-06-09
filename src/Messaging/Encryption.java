@@ -2,27 +2,21 @@ package Messaging;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
-import org.bouncycastle.openpgp.operator.PGPContentSigner;
 import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder;
-import org.bouncycastle.openpgp.operator.PGPKeyEncryptionMethodGenerator;
-import org.bouncycastle.openpgp.operator.bc.*;
+import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
-import org.bouncycastle.openpgp.operator.jcajce.JcePBEKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
-import org.bouncycastle.util.io.Streams;
-import org.bouncycastle.openpgp.PGPSignatureGenerator;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.*;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Optional;
 
 /**
  * Class encapsulating OpenPGP actions
@@ -72,9 +66,6 @@ public class Encryption {
         }
         OutputStream compressedOut = encryptedDataGenerator.open(out, new byte[BUFFER_SIZE]);
 
-        // Inicijalizacija generatora za kompresiju
-
-
         //ZIP
         PGPCompressedDataGenerator compressedDataGenerator = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
         if (compress) {
@@ -82,7 +73,7 @@ public class Encryption {
         }
 
         PGPSignatureGenerator signatureGenerator = null;
-        // Ako imamo kljuc za potpis:
+        //signature = true
         if (secretKey != null && sign == true) {
             PGPPublicKey pubSigKey = secretKey.getPublicKey();
 
@@ -131,7 +122,7 @@ public class Encryption {
         in.close();
 
     }
-
+///////////Ovo nam ne treba?
     static PGPPrivateKey findPrivateKey(PGPSecretKey pgpSecKey, char[] pass)
             throws PGPException
     {
