@@ -24,7 +24,7 @@ public class User {
 
 //    private static Vector<PGPPublicKeyRing> publicKeyRings = new Vector<>();
     private static HashMap<String, PGPPublicKey> publicMap = new HashMap<>();
-    private static HashMap<String, PGPPublicKeyRing> publicKeyRingHashMap = new HashMap<>();
+    private static HashMap<String, PGPKeyRing> publicKeyRingHashMap = new HashMap<>();
 
     private static HashMap<String, String> mapKeyUser = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class User {
     }
 
     // moze da bude null
-    public static PGPPublicKeyRing getPublicKeyRing(String username) {
+    public static PGPKeyRing getPublicKeyRing(String username) {
         return publicKeyRingHashMap.get(username);
     }
 
@@ -162,6 +162,13 @@ public class User {
             mapKeyUser.put(getString(key), username);
         }
 
+        for (Iterator<PGPPublicKey> keyIt = skr.getPublicKeys(); keyIt.hasNext();) {
+            PGPPublicKey pk = keyIt.next();
+            publicMap.put(getString(pk), pk);
+            mapKeyUser.put(getString(pk), username);
+        }
+        publicKeyRingHashMap.put(username, skr);
+
         secretKeyRingHashMap.put(username, skr);
 
         mapKeyUser.put(username, username);
@@ -190,7 +197,7 @@ public class User {
 
     private static void removePublicKeyRing(String username) {
 
-        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(username);
+        PGPKeyRing pkr = publicKeyRingHashMap.get(username);
         publicKeyRingHashMap.remove(username);
 
         boolean master = true;
@@ -210,8 +217,9 @@ public class User {
         PGPPublicKey pk = publicMap.get(keyId);
         publicMap.remove(keyId);
 
-        PGPPublicKeyRing pkr = publicKeyRingHashMap.get(username);
-        pkr = pkr.removePublicKey(pkr, pk);
+        PGPKeyRing pkr = publicKeyRingHashMap.get(username);
+        if (pkr instanceof PGPPublicKeyRing)
+            pkr = ((PGPPublicKeyRing)pkr).removePublicKey((PGPPublicKeyRing) pkr, pk);
         publicKeyRingHashMap.replace(username, pkr);
 
     }

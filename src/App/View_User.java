@@ -7,10 +7,7 @@ import Messaging.KeyRings;
 import Messaging.User;
 import org.bouncycastle.bcpg.ArmoredInputStream;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.*;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -825,11 +822,14 @@ public class View_User extends JFrame {
             if (returnVal == JFileChooser.APPROVE_OPTION){
                 ////////////////////PUBLIC KEY
                 if(selected_list == public_JList){
-                    PGPPublicKeyRing pkr = User.getPublicKeyRing(selected_list.getSelectedValue());
-                    try (ArmoredOutputStream out = new ArmoredOutputStream(Files.newOutputStream(Paths.get(chooser.getSelectedFile() + "-public.asc")))) {
-                        pkr.encode(out);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    PGPKeyRing kr = User.getPublicKeyRing(selected_list.getSelectedValue());
+                    if (kr instanceof PGPPublicKeyRing) {
+                        PGPPublicKeyRing pkr = (PGPPublicKeyRing) kr;
+                        try (ArmoredOutputStream out = new ArmoredOutputStream(Files.newOutputStream(Paths.get(chooser.getSelectedFile() + "-public.asc")))) {
+                            pkr.encode(out);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                 }
@@ -903,7 +903,7 @@ public class View_User extends JFrame {
                 }else return;
             }
 
-            if(fileToLoad.getName().contains("private.asc")) {
+            if(fileToLoad.getName().contains("private.asc") || fileToLoad.getName().contains("public.asc")) {
                 current_user = User.getUser(String.valueOf(userChoice.getSelectedItem()));
 
                 View_User.private_list.removeAll(private_list);
@@ -911,8 +911,8 @@ public class View_User extends JFrame {
 
                 private_Jlist.setListData(private_list);
                 lista2.setListData(private_list);
-            }
-            if(fileToLoad.getName().contains("public.asc")) {
+
+
                 View_User.public_list.removeAll(public_list);
                 View_User.public_list.addAll(User.getPublicKeys());
 

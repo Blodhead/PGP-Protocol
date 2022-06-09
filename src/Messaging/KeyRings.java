@@ -160,8 +160,9 @@ public class KeyRings {
 
                 username += " <" + mail + ">";
 
-                User.addPublicKeyRing(username, pkr);
                 User.addSecretKeyRing(username, skr);
+                User.addPublicKeyRing(username, pkr);
+
 //                user.addPrivateKey(algo, skr.getSecretKey());
 //                user.addPublicKey(algo, pkr.getPublicKey());
 
