@@ -5,20 +5,21 @@ import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
+import org.bouncycastle.openpgp.operator.PGPContentSigner;
 import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.PGPKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.operator.bc.*;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcePBEKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.util.io.Streams;
-
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Provider;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Optional;
@@ -43,27 +44,106 @@ public class Encryption {
             boolean is3DES)
             throws Exception
     {
+        OutputStream out = new FileOutputStream(fileName + ".pgp");
+        FileInputStream in = new FileInputStream(fileName);
 
+        PGPSignatureGenerator signatureGenerator = null;
+        if (radix64)
+            out = new ArmoredOutputStream(out);
+
+        // Provera odabranog algoritma
+        int algo = PGPEncryptedData.CAST5;
+
+        if (is3DES == false)
+            algo = PGPEncryptedData.IDEA;
+        else
+            algo = PGPEncryptedData.TRIPLE_DES;
+
+        JcePGPDataEncryptorBuilder c = new JcePGPDataEncryptorBuilder(algo).setWithIntegrityPacket(sign).setSecureRandom(new SecureRandom()).setProvider("BC");
+        PGPEncryptedDataGenerator encryptedDataGenerator = new PGPEncryptedDataGenerator(c);
+        PGPKeyEncryptionMethodGenerator method_gen = new JcePBEKeyEncryptionMethodGenerator(password).setProvider("BC");
+        //org.apache.nifi.processors.standard.util.PGPUtil.encrypt(in, out, algorithm, provider, PGPEncryptedData.AES_128, filename, encryptionMethodGenerator);
+        encryptedDataGenerator.addMethod(method_gen);
+
+        OutputStream compressedOut = encryptedDataGenerator.open(out, new byte[BUFFER_SIZE]);
+
+        // Inicijalizacija generatora za kompresiju
+        PGPCompressedDataGenerator compressedDataGenerator = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
+
+        if (compress)
+            compressedOut = compressedDataGenerator.open(compressedOut);
+
+        // Ako imamo kljuc za potpis:
+        if (secretKey != null && sign == true) {
+            PGPPublicKey pubSigKey = secretKey.getPublicKey();
+
+            PBESecretKeyDecryptor decryptorFactory = new BcPBESecretKeyDecryptorBuilder(
+                    new BcPGPDigestCalculatorProvider()).build(password);
+            PGPPrivateKey privateKey = secretKey.extractPrivateKey(decryptorFactory);
+            //secretKey = secretKey.extractPrivateKey(password);
+
+            int digest;
+            PGPContentSignerBuilder singbuilder = new JcaPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(),HashAlgorithmTags.SHA1);
+            singbuilder.build(publicKey.getAlgorithm(),privateKey);
+            signatureGenerator = new PGPSignatureGenerator(singbuilder);
+
+            signatureGenerator.init(PGPSignature.BINARY_DOCUMENT,privateKey);
+            Iterator it = pubSigKey.getUserIDs();
+
+            if (it.hasNext()) {
+                PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
+                spGen.setSignerUserID(false, (String) it.next());
+                signatureGenerator.setHashedSubpackets(spGen.generate());
+            }
+            signatureGenerator.generateOnePassVersion(false).encode(compressedOut);
+        }
+
+        PGPLiteralDataGenerator literalDataGenerator = new PGPLiteralDataGenerator();
+        OutputStream literalOut = literalDataGenerator.open(compressedOut, PGPLiteralData.BINARY, fileName, new Date(),
+                new byte[BUFFER_SIZE]);
+        FileInputStream inputFileStream = new FileInputStream(fileName);
+        byte[] buf = new byte[BUFFER_SIZE];
+        int len;
+        while ((len = inputFileStream.read(buf)) > 0) {
+            literalOut.write(buf, 0, len);
+            if (signatureGenerator != null)
+                signatureGenerator.update(buf, 0, len);
+        }
+
+        literalOut.close();
+        literalDataGenerator.close();
+        if (signatureGenerator != null)
+            signatureGenerator.generate().encode(compressedOut);
+
+        compressedOut.close();
+        compressedDataGenerator.close();
+        encryptedDataGenerator.close();
+        inputFileStream.close();
+        out.close();
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*
         // Initialize Bouncy Castle security provider
         OutputStream out = new FileOutputStream(fileName + ".pgp");
         FileInputStream in = new FileInputStream(fileName);
 
-        if (radix64) {//RADIX64
+        if (radix64) {
             out = new ArmoredOutputStream(out);
         }
-        //zasto
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 
-        if(compress) {//ZIP
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-            PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
-                    PGPCompressedData.ZIP);
-
-            //write to header that file is zipped
-            org.bouncycastle.openpgp.PGPUtil.writeFileToLiteralData(comData.open(byteOut),
-                    PGPLiteralData.BINARY, new File(fileName));
-            comData.close();
+        if(sign){
+            Signature dsa = Signature.getInstance("SHA/DSA");
+            //dsa.initSign(User.get);
         }
+
+        PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
+                PGPCompressedData.ZIP);
+
+        org.bouncycastle.openpgp.PGPUtil.writeFileToLiteralData(comData.open(bOut),
+                PGPLiteralData.BINARY, new File(fileName));
+        comData.close();
 
         JcePGPDataEncryptorBuilder c = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5).setWithIntegrityPacket(sign).setSecureRandom(new SecureRandom()).setProvider("BC");
 
@@ -73,15 +153,14 @@ public class Encryption {
 
         cPk.addMethod(d);
 
-        byte[] bytes = byteOut.toByteArray();
+        byte[] bytes = bOut.toByteArray();
 
         OutputStream cOut = cPk.open(out, bytes.length);
 
         cOut.write(bytes);
 
         cOut.close();
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // ENCRYPT
         /*BcPGPDataEncryptorBuilder dataEncryptor;
@@ -198,8 +277,10 @@ public class Encryption {
         /*if (encrypt)
             encryptedDataGenerator.close();*/
         //literalOut.close();
-        in.close();
-        out.close();
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        /*in.close();
+        out.close();*/
     }
 
     static PGPPrivateKey findPrivateKey(PGPSecretKey pgpSecKey, char[] pass)
