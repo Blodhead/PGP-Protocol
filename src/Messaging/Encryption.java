@@ -42,17 +42,16 @@ public class Encryption {
             boolean compress,
             boolean radix64,
             boolean is3DES)
-            throws Exception
-    {
+            throws Exception {
         OutputStream out = new FileOutputStream(fileName + ".pgp");
         FileInputStream in = new FileInputStream(fileName);
 
-        PGPSignatureGenerator signatureGenerator = null;
+
         if (radix64)
             out = new ArmoredOutputStream(out);
 
         // Provera odabranog algoritma
-        int algo = PGPEncryptedData.CAST5;
+        int algo;
 
         if (is3DES == false)
             algo = PGPEncryptedData.IDEA;
@@ -63,23 +62,23 @@ public class Encryption {
         PGPEncryptedDataGenerator encryptedDataGenerator = new PGPEncryptedDataGenerator(c);
 
         //encrypt with key
-        PGPKeyEncryptionMethodGenerator method_gen = new JcePBEKeyEncryptionMethodGenerator(password).setProvider("BC");
-        //org.apache.nifi.processors.standard.util.PGPUtil.encrypt(in, out, algorithm, provider, PGPEncryptedData.AES_128, filename, encryptionMethodGenerator);
+        //PGPKeyEncryptionMethodGenerator method_gen = new JcePBEKeyEncryptionMethodGenerator(password).setProvider("BC");
+        //encryptedDataGenerator.addMethod(method_gen);
 
         JcePublicKeyKeyEncryptionMethodGenerator d = new JcePublicKeyKeyEncryptionMethodGenerator(publicKey).setProvider("BC").setSecureRandom(new SecureRandom());
 
         encryptedDataGenerator.addMethod(d);
-
-        //encryptedDataGenerator.addMethod(method_gen);
 
         OutputStream compressedOut = encryptedDataGenerator.open(out, new byte[BUFFER_SIZE]);
 
         // Inicijalizacija generatora za kompresiju
         PGPCompressedDataGenerator compressedDataGenerator = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
 
+        //ZIP
         if (compress)
             compressedOut = compressedDataGenerator.open(compressedOut);
 
+        PGPSignatureGenerator signatureGenerator = null;
         // Ako imamo kljuc za potpis:
         if (secretKey != null && sign == true) {
             PGPPublicKey pubSigKey = secretKey.getPublicKey();
@@ -89,12 +88,12 @@ public class Encryption {
             PGPPrivateKey privateKey = secretKey.extractPrivateKey(decryptorFactory);
             //secretKey = secretKey.extractPrivateKey(password);
 
-            int digest;
-            PGPContentSignerBuilder singbuilder = new JcaPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(),HashAlgorithmTags.SHA1);
-            singbuilder.build(publicKey.getAlgorithm(),privateKey);
+            PGPContentSignerBuilder singbuilder = new JcaPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA1);
+            singbuilder.build(publicKey.getAlgorithm(), privateKey);
+
             signatureGenerator = new PGPSignatureGenerator(singbuilder);
 
-            signatureGenerator.init(PGPSignature.BINARY_DOCUMENT,privateKey);
+            signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, privateKey);
             Iterator it = pubSigKey.getUserIDs();
 
             if (it.hasNext()) {
@@ -128,166 +127,7 @@ public class Encryption {
         inputFileStream.close();
         out.close();
         in.close();
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /*
-        // Initialize Bouncy Castle security provider
-        OutputStream out = new FileOutputStream(fileName + ".pgp");
-        FileInputStream in = new FileInputStream(fileName);
 
-        if (radix64) {
-            out = new ArmoredOutputStream(out);
-        }
-
-        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-
-        if(sign){
-            Signature dsa = Signature.getInstance("SHA/DSA");
-            //dsa.initSign(User.get);
-        }
-
-        PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
-                PGPCompressedData.ZIP);
-
-        org.bouncycastle.openpgp.PGPUtil.writeFileToLiteralData(comData.open(bOut),
-                PGPLiteralData.BINARY, new File(fileName));
-        comData.close();
-
-        JcePGPDataEncryptorBuilder c = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5).setWithIntegrityPacket(sign).setSecureRandom(new SecureRandom()).setProvider("BC");
-
-        PGPEncryptedDataGenerator cPk = new PGPEncryptedDataGenerator(c);
-
-        JcePublicKeyKeyEncryptionMethodGenerator d = new JcePublicKeyKeyEncryptionMethodGenerator(publicKey).setProvider(new BouncyCastleProvider()).setSecureRandom(new SecureRandom());
-
-        cPk.addMethod(d);
-
-        byte[] bytes = bOut.toByteArray();
-
-        OutputStream cOut = cPk.open(out, bytes.length);
-
-        cOut.write(bytes);
-
-        cOut.close();
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // ENCRYPT
-        /*BcPGPDataEncryptorBuilder dataEncryptor;
-        PGPEncryptedDataGenerator encryptedDataGenerator = null;*/
-/*
-        if (encrypt) {
-
-            // biranje algoritma
-            if (is3DES) {
-                dataEncryptor = new BcPGPDataEncryptorBuilder(PGPEncryptedData.TRIPLE_DES);
-            }
-            else {
-                dataEncryptor = new BcPGPDataEncryptorBuilder(PGPEncryptedData.IDEA);
-            }
-
-            // nesto radi
-            dataEncryptor.setWithIntegrityPacket(true);
-
-            // generisanje sesijskog kljuca
-            dataEncryptor.setSecureRandom(new SecureRandom());
-
-            // inicijalizacija enkriptora podataka
-            encryptedDataGenerator = new PGPEncryptedDataGenerator(dataEncryptor);
-
-            // provarava da li je kljuc ElGamal
-            if (!publicKey.isEncryptionKey()) {
-                // error
-                return;
-            }
-
-            // enkriptovanje sesijskog kljuca
-            encryptedDataGenerator.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(publicKey));
-
-            // enkriptovanje poruke
-            out = encryptedDataGenerator.open(out, new byte[Encryption.BUFFER_SIZE]);
-
-        }
-
-        // COMPRESS
-        PGPCompressedDataGenerator compressedDataGenerator = null;
-        if(compress) {
-            compressedDataGenerator =
-                    new PGPCompressedDataGenerator(compress ? PGPCompressedData.ZIP : PGPCompressedData.UNCOMPRESSED);
-            out = compressedDataGenerator.open(out, new byte[Encryption.BUFFER_SIZE]);
-        }
-        // SIGN
-        PGPSignatureGenerator signatureGenerator = null;
-        if (sign) {
-
-            // da li je DSA kljuc
-            if (!secretKey.isSigningKey()) {
-                // error
-                return;
-            }
-
-            // dohvata pravi private key
-            PGPPrivateKey privateKey = findPrivateKey(secretKey, password);
-
-            // generise i nicijalizuje sign generator
-            PGPContentSignerBuilder signerBuilder = new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(),
-                    HashAlgorithmTags.SHA1);
-            signatureGenerator = new PGPSignatureGenerator(signerBuilder);
-            signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, privateKey);
-
-
-            String username = secretKey.getPublicKey().getUserIDs().next();
-
-            //
-            PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
-                //noinspection deprecation
-
-            // podesi koji je user
-            spGen.setSignerUserID(false, username.getBytes(StandardCharsets.UTF_8)); // mozda dodje do greske
-//            spGen.setSignerUserID(false, username);
-
-            // doda heshiran deo potpisa
-            signatureGenerator.setHashedSubpackets(spGen.generate());
-
-            signatureGenerator.generateOnePassVersion(false).encode(out);
-        }
-
-        // Pravljenje header-a
-        /*PGPLiteralDataGenerator headerDataGenerator = new PGPLiteralDataGenerator();
-        OutputStream literalOut = headerDataGenerator.open(
-                out,
-                PGPLiteralData.BINARY,
-                fileName,
-                new Date(),
-                new byte [Encryption.BUFFER_SIZE] );
-        // Main loop - read the "in" stream, compress, encrypt and write to the "out" stream
-
-        // dohvatanje plain teksta
-
-        byte[] buf = new byte[Encryption.BUFFER_SIZE];
-        int len;
-
-        // sifruje chunk po chunk
-        while ((len = in.read(buf)) > 0) {
-
-            // enkriptuje,
-            literalOut.write(buf, 0, len);
-            if (sign)
-                signatureGenerator.update(buf, 0, len);
-        }
-
-
-        headerDataGenerator.close();
-        // Generate the signature, compress, encrypt and write to the "out" stream
-
-        if (sign)
-            signatureGenerator.generate().encode(out);
-        if (compress)
-            compressedDataGenerator.close();*/
-        /*if (encrypt)
-            encryptedDataGenerator.close();*/
-        //literalOut.close();
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        /*in.close();
-        out.close();*/
     }
 
     static PGPPrivateKey findPrivateKey(PGPSecretKey pgpSecKey, char[] pass)
