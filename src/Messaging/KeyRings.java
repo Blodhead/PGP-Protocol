@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
 import javax.crypto.Cipher;
+import javax.crypto.spec.DHParameterSpec;
 import java.security.*;
 import java.util.Collections;
 
@@ -183,13 +184,23 @@ public class KeyRings {
                 kp = generateNewKeyPair(algo, size, password);
 
                 if(size == 4096) {// ne radi
-
-                    /*FIRST TRY
-                    ElGamalKeyPairGenerator elGamalKeyPairGenerator = new ElGamalKeyPairGenerator();
-                    elGamalKeyPairGenerator.init(new KeyGenerationParameters(new SecureRandom(), 4096));
-                    AsymmetricCipherKeyPair elgKp = elGamalKeyPairGenerator.generateKeyPair();
-                    kp = new BcPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
-                    */
+////
+////                    KeyPairGenerator    elgKpg = KeyPairGenerator.getInstance("ELGAMAL", "BC");
+//                    BigInteger          g = new BigInteger("153d5d6172adb43045b68ae8e1de1070b6137005686d29d3d73a7749199681ee5b212c9b96bfdcfa5b20cd5e3fd2044895d609cf9b410b7a0f12ca1cb9a428cc", 16);
+//                    BigInteger          p = new BigInteger("9494fec095f3b85ee286542b3836fc81a5dd0a0349b4c239dd38744d488cf8e31db8bcb7d33b41abb9e5a33cca9144b1cef332c94bf0573bf047a3aca98cdf3b", 16);
+//
+//                    DHParameterSpec elParams = new DHParameterSpec(p, g);
+////
+////                    elgKpg.initialize(elParams);
+////
+////                    kp = elgKpg.generateKeyPair();
+//
+//
+//                    ElGamalKeyPairGenerator elGamalKeyPairGenerator = new ElGamalKeyPairGenerator();
+//                    elGamalKeyPairGenerator.init(new ElGamalKeyGenerationParameters(new SecureRandom(), elParams));
+//                    AsymmetricCipherKeyPair elgKp = elGamalKeyPairGenerator.generateKeyPair();
+//                    kp = new BcPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
+//
 
                     /*SECOND TRY
                                     BigInteger bi2 = BigInteger.probablePrime(16, new Random());
@@ -241,8 +252,8 @@ public class KeyRings {
 //                user.addPublicKey(algo, krg.generatePublicKeyRing().getPublicKey());
 
             }
-            catch (NoSuchElementException e) {
-                return "NoSuchElementException";
+            catch (Exception e) {
+                return "Exception";
             }
 
 
