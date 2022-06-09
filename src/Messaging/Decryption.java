@@ -93,7 +93,7 @@ public class Decryption {
 
             for (int i = 0; i < onePassSignatureList.size(); i++){
                 PGPOnePassSignature ops = onePassSignatureList.get(0);
-                //if(ops.getKeyID() == User.getPublicKey());
+                if(String.valueOf(ops.getKeyID()) == String.valueOf(pbe.getKeyID()));
             }
             message = plainFact.nextObject();
         }
