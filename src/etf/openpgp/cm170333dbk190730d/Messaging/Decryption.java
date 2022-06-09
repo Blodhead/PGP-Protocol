@@ -1,27 +1,14 @@
-package Messaging;
+package etf.openpgp.cm170333dbk190730d.Messaging;
 
-import App.View_User;
-import org.bouncycastle.bcpg.LiteralDataPacket;
-import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
-import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
-import org.bouncycastle.openpgp.operator.PGPDataDecryptorFactory;
 import org.bouncycastle.openpgp.operator.PublicKeyDataDecryptorFactory;
-import org.bouncycastle.openpgp.operator.bc.*;
-import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
-import org.bouncycastle.util.io.Streams;
 
-import javax.swing.*;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.util.Iterator;
-import java.util.Optional;
 
 public class Decryption {
 

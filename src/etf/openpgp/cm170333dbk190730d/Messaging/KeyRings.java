@@ -1,31 +1,19 @@
-package Messaging;
+package etf.openpgp.cm170333dbk190730d.Messaging;
 
-import App.View_User;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
-import org.bouncycastle.bcpg.PublicKeyPacket;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.KeyGenerationParameters;
-import org.bouncycastle.crypto.generators.ElGamalKeyPairGenerator;
-import org.bouncycastle.crypto.params.ElGamalKeyGenerationParameters;
-import org.bouncycastle.crypto.params.ElGamalParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.bc.BcPGPObjectFactory;
-import org.bouncycastle.openpgp.operator.KeyFingerPrintCalculator;
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
-import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
 import org.bouncycastle.openpgp.operator.jcajce.*;
 
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.*;
 import javax.crypto.Cipher;
-import javax.crypto.spec.DHParameterSpec;
 import java.security.*;
 import java.util.Collections;
 
