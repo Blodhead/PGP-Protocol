@@ -5,10 +5,12 @@ import Messaging.Decryption;
 import Messaging.Encryption;
 import Messaging.KeyRings;
 import Messaging.User;
+import org.bouncycastle.bcpg.ArmoredInputStream;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.PGPUtil;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -19,12 +21,10 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Key;
 import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -149,7 +149,7 @@ public class View_User extends JFrame {
         p3.setLayout(new BorderLayout());
         p4.setLayout(new BorderLayout());
 
-        current_user = User.getUser("Milos");
+        current_user = User.getUser("Milos <milos>");
 
     }
     private void fill_tab1(){
@@ -709,7 +709,7 @@ public class View_User extends JFrame {
 
         generate_dsa.addActionListener( e -> {
 
-            if(!current_user.getUsername().equals(username.getText())) {
+            if(!current_user.getUsername().equals(username.getText()+ " <" + mail.getText() + ">")) {
                 JOptionPane.showMessageDialog(error_msg,
                         "This user can generate private keys only for him/her self!",
                         "Error message",
@@ -734,12 +734,12 @@ public class View_User extends JFrame {
             }
             try {
                 if(dsa_button.isSelected())
-                    KeyRings.generateNewUserKeyPair("DSA",username.getText(), String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
+                    KeyRings.generateNewUserKeyPair("DSA",username.getText() , String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( dsa_choice.getSelectedItem().toString()));
                 else
                     KeyRings.generateNewUserKeyPair("ElGamal",username.getText(),String.valueOf(pass_field.getPassword()),mail.getText(), Integer.parseInt( elGamal_choice.getSelectedItem().toString()));
 
                 View_User.private_list.removeAll(private_list);
-                View_User.private_list.addAll(User.getSecretKeys(username.getText()));
+                View_User.private_list.addAll(User.getSecretKeys(username.getText()+ " <" + mail.getText() + ">"));
 
                 private_Jlist.setListData(private_list);
                 lista2.setListData(private_list);
@@ -810,7 +810,7 @@ public class View_User extends JFrame {
             }
 
 
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "asc");
             chooser.setFileFilter(filter);
 
             int returnVal;
@@ -852,7 +852,7 @@ public class View_User extends JFrame {
         imp_key_button.addActionListener(ae -> {
             JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             File fileToLoad;
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "*.asc");
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "asc");
             chooser.setFileFilter(filter);
             boolean good_choice = false;
             int returnVal;
@@ -861,12 +861,20 @@ public class View_User extends JFrame {
                 returnVal = chooser.showOpenDialog(null);
                 if (returnVal == JFileChooser.APPROVE_OPTION){
                     fileToLoad = chooser.getSelectedFile();
-                    if(fileToLoad.getName().contains("private.asc")){
+                    if(fileToLoad.getName().contains("private.asc") || fileToLoad.getName().contains("public.asc")){
                         ///
                         good_choice = true;
-                    }else if(fileToLoad.getName().contains("public.asc")) {
-                        ///
-                        good_choice = true;
+
+                        try {
+                            FileInputStream fis = new FileInputStream(fileToLoad);
+
+                            KeyRings.importKeyRing(fis);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+
                     }else{
                         JOptionPane.showMessageDialog(error_msg,
                                 "Choose a valid private or public key ring!",
@@ -876,6 +884,18 @@ public class View_User extends JFrame {
 
                 }else return;
             }
+
+//            View_User.private_list.removeAll(private_list);
+//            View_User.private_list.addAll(User.getSecretKeys(username.getText()));
+//
+//            private_Jlist.setListData(private_list);
+//            lista2.setListData(private_list);
+//
+//            View_User.public_list.removeAll(public_list);
+//            View_User.public_list.addAll(User.getPublicKeys());
+//
+//            public_JList.setListData(public_list);
+//            lista1.setListData(public_list);
 
         });
 
@@ -887,7 +907,7 @@ public class View_User extends JFrame {
                 User.removePrivateKey(selected_list.getSelectedValue());//#keyId
             }
             View_User.private_list.removeAll(private_list);
-            View_User.private_list.addAll(User.getSecretKeys(username.getText()));
+            View_User.private_list.addAll(User.getSecretKeys(username.getText()+ " <" + mail.getText() + ">"));
 
             private_Jlist.setListData(private_list);
             lista2.setListData(private_list);
@@ -959,7 +979,7 @@ public class View_User extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            else if(User.getUser(reg_username.getText()) != null){
+            else if(User.getUser(reg_username.getText() + " <" + reg_mail.getText() + ">") != null){
                 JOptionPane.showMessageDialog(error_msg,
                         "User already exists!",
                         "Error message",
@@ -968,7 +988,7 @@ public class View_User extends JFrame {
             }
 
             optionsToChoose.removeAll(User.getAllUsers());
-            User u = new User(reg_username.getText(),String.valueOf(reg_pass.getPassword()));
+            User u = new User(reg_username.getText() + " <" + reg_mail.getText() + ">", String.valueOf(reg_pass.getPassword()));
 
             Vector<String> list = User.getAllUsers();
             Iterator value = list.iterator();

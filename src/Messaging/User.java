@@ -55,10 +55,18 @@ public class User {
     }
 
     private static String getString(PGPSecretKey sk) { // ElGamal
+
+        if (sk.isMasterKey())
+            return sk.getUserIDs().next();
+
         return "#" + sk.getKeyID();
     }
 
     private static String getString(PGPPublicKey pk) {
+
+        if (pk.isMasterKey())
+            return pk.getUserIDs().next();
+
         return "#" + pk.getKeyID();
     }
 
@@ -127,6 +135,13 @@ public class User {
         publicMap.put(username, pkr.getPublicKey());
         publicKeyRingHashMap.put(username, pkr);
         mapKeyUser.put(username, username);
+
+        for (Iterator<PGPPublicKey> keyIter = pkr.getPublicKeys(); keyIter.hasNext();) {
+            PGPPublicKey pk = keyIter.next();
+            publicMap.put(getString(pk), pkr.getPublicKey());
+            mapKeyUser.put(getString(pk), username);
+        }
+
     }
 
     public static void addPublicSubKey(String username, PGPPublicKeyRing pkr, PGPPublicKey pk) {
@@ -142,7 +157,13 @@ public class User {
     public static void addSecretKeyRing(String username, PGPSecretKeyRing skr) {
         User user = userMap.get(username);
         user.secretKeyRing = skr;
-        secretMap.put(username, skr.getSecretKey());
+
+        for (Iterator<PGPSecretKey> keyIt = skr.getSecretKeys(); keyIt.hasNext();) {
+            PGPSecretKey key = keyIt.next();
+            secretMap.put(getString(key), skr.getSecretKey());
+            mapKeyUser.put(getString(key), username);
+        }
+
         secretKeyRingHashMap.put(username, skr);
 
         mapKeyUser.put(username, username);

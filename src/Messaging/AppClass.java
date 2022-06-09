@@ -28,8 +28,8 @@ public class AppClass {
 //            throw new RuntimeException(e);
 //        }
 
-    User u1 = new User("Milos", "123456");
-    User u2 = new User("Ksenija", "123456");
+    User u1 = new User("Milos <milos>", "123456");
+    User u2 = new User("Ksenija <ksenija>", "123456");
 
         View_User.getUser_view();
 

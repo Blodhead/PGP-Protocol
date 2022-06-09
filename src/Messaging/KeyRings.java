@@ -2,6 +2,7 @@ package Messaging;
 
 import App.View_User;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
+import org.bouncycastle.bcpg.PublicKeyPacket;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.KeyGenerationParameters;
 import org.bouncycastle.crypto.generators.ElGamalKeyPairGenerator;
@@ -10,12 +11,15 @@ import org.bouncycastle.crypto.params.ElGamalParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+import org.bouncycastle.openpgp.bc.BcPGPObjectFactory;
+import org.bouncycastle.openpgp.operator.KeyFingerPrintCalculator;
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
 import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
 import org.bouncycastle.openpgp.operator.jcajce.*;
 
 
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -154,6 +158,7 @@ public class KeyRings {
 //                pkr = PGPPublicKeyRing.insertPublicKey(pkr, kp.getPublicKey());
                 publicKeyRingCollection = PGPPublicKeyRingCollection.addPublicKeyRing(publicKeyRingCollection, pkr);//DRUGI PUT KAD SE GENERISE KLJUC ISKACE ERROR
 
+                username += " <" + mail + ">";
 
                 User.addPublicKeyRing(username, pkr);
                 User.addSecretKeyRing(username, skr);
@@ -226,6 +231,7 @@ public class KeyRings {
                     pk = iterator.next();
                 }
 
+                username += " <" + mail + ">";
                 User.addPublicSubKey(username, pkr, pk);
                 User.addSecretSubKey(username, skr, sk);
 
@@ -268,6 +274,37 @@ public class KeyRings {
     public static PGPPublicKey getPublicKeyByID(long _id) throws PGPException {
         return publicKeyRingCollection.getPublicKey(_id);
     }
+
+
+    public static void importKeyRing(InputStream in) {
+
+        try {
+            BcPGPObjectFactory factory = new BcPGPObjectFactory(PGPUtil.getDecoderStream(in));
+
+            Object o = factory.nextObject();
+
+            if (o instanceof PGPPublicKeyRing) {
+
+                PGPPublicKeyRing pkr = (PGPPublicKeyRing) o;
+
+                String username = pkr.getPublicKey().getUserIDs().next();
+
+                User.addPublicKeyRing(username, pkr);
+
+            } else if (o instanceof PGPSecretKeyRing) {
+
+                PGPSecretKeyRing skr = (PGPSecretKeyRing) o;
+
+                String username = skr.getSecretKey().getUserIDs().next();
+
+                User.addSecretKeyRing(username, skr);
+
+            }
+
+        } catch (Exception e) {}
+
+    }
+
 
 
 
