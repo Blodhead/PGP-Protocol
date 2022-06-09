@@ -128,7 +128,6 @@ public class User {
         return returnVector;
     }
 
-    // mora da se napravi i kad ima subkey-eve da radi
     public static void addPublicKeyRing(String username, PGPPublicKeyRing pkr) {
         User user = userMap.get(username);
 //        publicKeyRings.addElement(pkr);
@@ -153,7 +152,6 @@ public class User {
         mapKeyUser.put(getString(pk), username);
     }
 
-    // mora da se napravi i kad ima subkey-eve da radi
     public static void addSecretKeyRing(String username, PGPSecretKeyRing skr) {
         User user = userMap.get(username);
         user.secretKeyRing = skr;
@@ -218,7 +216,6 @@ public class User {
 
     }
 
-
     public static void removePrivateKey(String keyId) {
 
         if (keyId.charAt(0) == '#')
@@ -258,7 +255,6 @@ public class User {
 
     }
 
-
     public static Vector<String> getAllUsers() {
         Vector<String> vector = new Vector<>();
         vector.addAll(userMap.keySet());
@@ -268,7 +264,6 @@ public class User {
     public static User getUser(String username){
         return userMap.get(username);
     }
-
 
     public static PGPPublicKey getPublicKey(String keyId) {
         return publicMap.get(keyId);
