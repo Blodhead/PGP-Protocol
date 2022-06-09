@@ -47,17 +47,23 @@ public class Encryption {
         // Initialize Bouncy Castle security provider
         OutputStream out = new FileOutputStream(fileName + ".pgp");
         FileInputStream in = new FileInputStream(fileName);
-        if (radix64) {
+
+        if (radix64) {//RADIX64
             out = new ArmoredOutputStream(out);
         }
-        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        //zasto
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 
-        PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
-                PGPCompressedData.ZIP);
+        if(compress) {//ZIP
 
-        org.bouncycastle.openpgp.PGPUtil.writeFileToLiteralData(comData.open(bOut),
-                PGPLiteralData.BINARY, new File(fileName));
-        comData.close();
+            PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
+                    PGPCompressedData.ZIP);
+
+            //write to header that file is zipped
+            org.bouncycastle.openpgp.PGPUtil.writeFileToLiteralData(comData.open(byteOut),
+                    PGPLiteralData.BINARY, new File(fileName));
+            comData.close();
+        }
 
         JcePGPDataEncryptorBuilder c = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5).setWithIntegrityPacket(sign).setSecureRandom(new SecureRandom()).setProvider("BC");
 
@@ -67,7 +73,7 @@ public class Encryption {
 
         cPk.addMethod(d);
 
-        byte[] bytes = bOut.toByteArray();
+        byte[] bytes = byteOut.toByteArray();
 
         OutputStream cOut = cPk.open(out, bytes.length);
 

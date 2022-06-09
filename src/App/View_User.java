@@ -78,7 +78,7 @@ public class View_User extends JFrame {
     private JPasswordField reg_pass;
     private Vector<String> optionsToChoose;
     private JList<String> lista1;
-    private JList<Object> lista2;
+    private JList<String> lista2;
     private JButton send;
     private JTextField plaintext_field;
     private File plaintext_file;
@@ -851,7 +851,7 @@ public class View_User extends JFrame {
 
         imp_key_button.addActionListener(ae -> {
             JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-            File fileToLoad;
+            File fileToLoad = null;
             FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "asc");
             chooser.setFileFilter(filter);
             boolean good_choice = false;
@@ -885,18 +885,22 @@ public class View_User extends JFrame {
                 }else return;
             }
 
-//            View_User.private_list.removeAll(private_list);
-//            View_User.private_list.addAll(User.getSecretKeys(username.getText()));
-//
-//            private_Jlist.setListData(private_list);
-//            lista2.setListData(private_list);
-//
-//            View_User.public_list.removeAll(public_list);
-//            View_User.public_list.addAll(User.getPublicKeys());
-//
-//            public_JList.setListData(public_list);
-//            lista1.setListData(public_list);
+            if(fileToLoad.getName().contains("private.asc")) {
+                current_user = User.getUser(String.valueOf(userChoice.getSelectedItem()));
 
+                View_User.private_list.removeAll(private_list);
+                View_User.private_list.addAll(User.getSecretKeys(current_user.getUsername()));
+
+                private_Jlist.setListData(private_list);
+                lista2.setListData(private_list);
+            }
+            if(fileToLoad.getName().contains("public.asc")) {
+                View_User.public_list.removeAll(public_list);
+                View_User.public_list.addAll(User.getPublicKeys());
+
+                public_JList.setListData(public_list);
+                lista1.setListData(public_list);
+            }
         });
 
         del_button.addActionListener(e -> {
