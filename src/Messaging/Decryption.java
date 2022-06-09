@@ -84,9 +84,18 @@ public class Decryption {
             pgpFact = new PGPObjectFactory(cData.getDataStream(), null);
             message = pgpFact.nextObject();
         }
-
+        PGPOnePassSignatureList onePassSignatureList;
         if (message instanceof  PGPOnePassSignatureList){
-            //message = pgpFact.nextObject();
+
+            onePassSignatureList = (PGPOnePassSignatureList)message;
+
+            if(onePassSignatureList == null) return; //error
+
+            for (int i = 0; i < onePassSignatureList.size(); i++){
+                PGPOnePassSignature ops = onePassSignatureList.get(0);
+                //if(ops.getKeyID() == User.getPublicKey());
+            }
+            message = plainFact.nextObject();
         }
 
         if (message instanceof  PGPLiteralData) {
