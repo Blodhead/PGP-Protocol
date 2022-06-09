@@ -61,9 +61,16 @@ public class Encryption {
 
         JcePGPDataEncryptorBuilder c = new JcePGPDataEncryptorBuilder(algo).setWithIntegrityPacket(sign).setSecureRandom(new SecureRandom()).setProvider("BC");
         PGPEncryptedDataGenerator encryptedDataGenerator = new PGPEncryptedDataGenerator(c);
+
+        //encrypt with key
         PGPKeyEncryptionMethodGenerator method_gen = new JcePBEKeyEncryptionMethodGenerator(password).setProvider("BC");
         //org.apache.nifi.processors.standard.util.PGPUtil.encrypt(in, out, algorithm, provider, PGPEncryptedData.AES_128, filename, encryptionMethodGenerator);
-        encryptedDataGenerator.addMethod(method_gen);
+
+        JcePublicKeyKeyEncryptionMethodGenerator d = new JcePublicKeyKeyEncryptionMethodGenerator(publicKey).setProvider("BC").setSecureRandom(new SecureRandom());
+
+        encryptedDataGenerator.addMethod(d);
+
+        //encryptedDataGenerator.addMethod(method_gen);
 
         OutputStream compressedOut = encryptedDataGenerator.open(out, new byte[BUFFER_SIZE]);
 
@@ -120,7 +127,7 @@ public class Encryption {
         encryptedDataGenerator.close();
         inputFileStream.close();
         out.close();
-
+        in.close();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
         /*
         // Initialize Bouncy Castle security provider

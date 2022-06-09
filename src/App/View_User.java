@@ -850,6 +850,8 @@ public class View_User extends JFrame {
         });
 
         imp_key_button.addActionListener(ae -> {
+
+
             JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             File fileToLoad = null;
             FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC files (*.asc)", "asc");
@@ -862,7 +864,16 @@ public class View_User extends JFrame {
                 if (returnVal == JFileChooser.APPROVE_OPTION){
                     fileToLoad = chooser.getSelectedFile();
                     if(fileToLoad.getName().contains("private.asc") || fileToLoad.getName().contains("public.asc")){
-                        ///
+
+                        //CURRENT_USER ne bi trebao da moze da doda privatne kljuceve vlasnika fjla
+                        if(fileToLoad.getName().contains("private.asc")){
+                            JOptionPane.showMessageDialog(error_msg,
+                                    "You can import only your private keys!",
+                                    "Error message",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
                         good_choice = true;
 
                         try {
