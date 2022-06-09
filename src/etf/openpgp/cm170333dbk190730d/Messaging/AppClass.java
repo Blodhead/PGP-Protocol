@@ -1,7 +1,6 @@
-package Messaging;
+package etf.openpgp.cm170333dbk190730d.Messaging;
 
-import java.io.IOException;
-import App.*;
+import etf.openpgp.cm170333dbk190730d.App.View_User;
 
 //import Zipping.*;
 public class AppClass {

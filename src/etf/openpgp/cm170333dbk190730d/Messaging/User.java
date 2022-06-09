@@ -1,11 +1,7 @@
-package Messaging;
+package etf.openpgp.cm170333dbk190730d.Messaging;
 
 import org.bouncycastle.openpgp.*;
 
-import javax.crypto.SecretKey;
-import javax.jws.soap.SOAPBinding;
-import javax.net.ssl.SSLEngineResult;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;

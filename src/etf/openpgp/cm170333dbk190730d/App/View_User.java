@@ -1,11 +1,10 @@
 
-package App;
+package etf.openpgp.cm170333dbk190730d.App;
 
-import Messaging.Decryption;
-import Messaging.Encryption;
-import Messaging.KeyRings;
-import Messaging.User;
-import org.bouncycastle.bcpg.ArmoredInputStream;
+import etf.openpgp.cm170333dbk190730d.Messaging.Decryption;
+import etf.openpgp.cm170333dbk190730d.Messaging.Encryption;
+import etf.openpgp.cm170333dbk190730d.Messaging.KeyRings;
+import etf.openpgp.cm170333dbk190730d.Messaging.User;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.openpgp.*;
 
@@ -21,9 +20,7 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Key;
 import java.security.SignatureException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Vector;
@@ -92,7 +89,7 @@ public class View_User extends JFrame {
 
     private View_User() {
         super("Pretty Good Privacy protocol");
-        //Setting up look and feel, in other words the theme of our App
+        //Setting up look and feel, in other words the theme of our etf.openpgp.cm170333dbk190730d.App
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
